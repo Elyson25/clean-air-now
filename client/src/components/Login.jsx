@@ -1,7 +1,9 @@
+// client/src/components/Login.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import ForgotPasswordLink from './ForgotPasswordLink'; // Import the new component
 
 const Login = () => {
   const { login } = useAuth();
@@ -52,6 +54,8 @@ const Login = () => {
             required
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+          {/* Add the link component here */}
+          <ForgotPasswordLink />
         </div>
         <button
           type="submit"

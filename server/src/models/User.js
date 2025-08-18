@@ -26,6 +26,9 @@ const UserSchema = new mongoose.Schema({
     required: true,
     default: false,
   },
+  // --- ADDED FIELDS ---
+  passwordResetToken: String,
+  passwordResetExpires: Date,
 }, {
   timestamps: true,
 });
