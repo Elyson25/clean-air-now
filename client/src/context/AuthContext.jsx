@@ -1,8 +1,7 @@
 // client/src/context/AuthContext.jsx
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import io from 'socket.io-client';
-
-const SOCKET_SERVER_URL = "http://localhost:5000";
+import { API_URL } from '../apiConfig'; // Import the central URL
 
 const AuthContext = createContext(null);
 
@@ -13,7 +12,6 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [socket, setSocket] = useState(null);
 
-  // Effect to check for existing user in localStorage on initial load
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
@@ -25,41 +23,28 @@ export const AuthProvider = ({ children }) => {
           setIsAuthenticated(true);
         }
       } catch (error) {
-        // If data is corrupt, clear it
         logout();
       }
     }
     setIsLoading(false);
   }, []);
 
-  // Effect to manage the socket connection based on authentication status
   useEffect(() => {
     if (isAuthenticated) {
-      console.log('AuthContext: User is authenticated. Attempting to connect socket...');
-      const newSocket = io(SOCKET_SERVER_URL);
-
+      const newSocket = io(API_URL); // Use the central URL
       newSocket.on('connect', () => {
-        // --- THIS IS THE MOST IMPORTANT LOG ---
-        console.log(`%cAuthContext: Socket connected successfully! ID: ${newSocket.id}`, 'color: green; font-weight: bold;');
+        console.log(`Socket connected successfully! ID: ${newSocket.id}`);
       });
-      
       newSocket.on('connect_error', (err) => {
-        // --- THIS LOG WILL SHOW CONNECTION ERRORS ---
-        console.error(`%cAuthContext: Socket connection error! Reason: ${err.message}`, 'color: red; font-weight: bold;');
+        console.error(`Socket connection error! Reason: ${err.message}`);
       });
-
       setSocket(newSocket);
-
-      // Cleanup function: runs when the user logs out
       return () => {
-        console.log('AuthContext: Disconnecting socket.');
         newSocket.disconnect();
         setSocket(null);
       };
-    } else {
-      console.log('AuthContext: User is not authenticated. Socket not connected.');
     }
-  }, [isAuthenticated]); // Dependency: runs when isAuthenticated changes
+  }, [isAuthenticated]);
 
   const login = (userData) => {
     localStorage.setItem('token', userData.token);
@@ -77,15 +62,7 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
-  const value = {
-    user,
-    token,
-    isAuthenticated,
-    isLoading,
-    socket, // Expose socket through the context
-    login,
-    logout,
-  };
+  const value = { user, token, isAuthenticated, isLoading, socket, login, logout };
   
   return (
     <AuthContext.Provider value={value}>

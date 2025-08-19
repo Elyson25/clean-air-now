@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import { API_URL } from '../apiConfig'; // Import the central URL
 
 const AdminReportsTable = () => {
   const { token } = useAuth();
@@ -10,36 +11,29 @@ const AdminReportsTable = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Function to fetch all reports from the admin endpoint
-  const fetchAllReports = async () => {
-    setIsLoading(true);
-    try {
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      const res = await axios.get('http://localhost:5000/api/reports', config);
-      setReports(res.data);
-    } catch (err) {
-      setError('Failed to fetch reports.');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Fetch reports when the component mounts
   useEffect(() => {
+    const fetchAllReports = async () => {
+      if (!token) return;
+      setIsLoading(true);
+      try {
+        const config = { headers: { Authorization: `Bearer ${token}` } };
+        const res = await axios.get(`${API_URL}/api/reports`, config); // Use the central URL
+        setReports(res.data);
+      } catch (err) {
+        setError('Failed to fetch reports.');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
     fetchAllReports();
-  }, [token]); // Dependency on token ensures we have it before fetching
+  }, [token]);
 
-  // Handler for when an admin changes a report's status
   const handleStatusChange = async (reportId, newStatus) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const body = { status: newStatus };
-      
-      // Call the PUT endpoint to update the status
-      await axios.put(`http://localhost:5000/api/reports/${reportId}/status`, body, config);
-
-      // Update the state locally for an instant UI update
+      await axios.put(`${API_URL}/api/reports/${reportId}/status`, body, config); // Use the central URL
       setReports(reports.map(report =>
         report._id === reportId ? { ...report, status: newStatus } : report
       ));
@@ -50,8 +44,8 @@ const AdminReportsTable = () => {
     }
   };
 
-  if (isLoading) return <p>Loading reports...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  if (isLoading) return <p className="text-center p-4">Loading reports...</p>;
+  if (error) return <p className="text-red-500 text-center p-4">{error}</p>;
 
   return (
     <div className="bg-white shadow-md rounded-lg my-6">
