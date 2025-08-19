@@ -1,10 +1,4 @@
-# Clean Air Now - Real-Time Air Quality Monitoring
-
-![Clean Air Now Dashboard Screenshot](./readme-screenshot.png)
-*(Note: `[YOUR GITHUB REPO LINK]` with the actual URL to your GitHub repository.
-4.  Save the file, then commit and push it to GitHub.
-
-Clean Air Now: A Full-Stack MERN GIS Application
+# Clean Air Now: A Full-Stack MERN GIS Application
 
 Live Application: [**https://clean-air-now.vercel.app/**](https://clean-air-now.vercel.app/)
 
