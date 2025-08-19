@@ -1,26 +1,33 @@
 const express = require('express');
 const router = express.Router();
+const { body } = require('express-validator');
 const {
   registerUser,
   loginUser,
   getUserProfile,
   getAllUsers,
-  forgotPassword,
-  resetPassword,
 } = require('../controllers/userController');
 const { protect, admin } = require('../middleware/authMiddleware');
+const { handleValidationErrors } = require('../middleware/validationMiddleware');
 
-router.route('/register').post(registerUser);
-router.route('/login').post(loginUser);
+// --- Validation Rules ---
+const registerValidation = [
+  body('name', 'Name is required').not().isEmpty().trim().escape(),
+  body('email', 'Please include a valid email').isEmail().normalizeEmail(),
+  body('password', 'Password must be 6 or more characters').isLength({ min: 6 }),
+  handleValidationErrors,
+];
 
-// --- NEW PASSWORD RESET ROUTES ---
-router.post('/forgot-password', forgotPassword);
-router.put('/reset-password/:token', resetPassword);
+const loginValidation = [
+  body('email', 'Please include a valid email').isEmail().normalizeEmail(),
+  body('password', 'Password is required').exists(),
+  handleValidationErrors,
+];
 
-// --- PROTECTED ROUTES ---
+// --- Route Definitions ---
+router.route('/register').post(registerValidation, registerUser);
+router.route('/login').post(loginValidation, loginUser);
 router.route('/profile').get(protect, getUserProfile);
-
-// --- ADMIN ROUTES ---
 router.route('/').get(protect, admin, getAllUsers);
 
 module.exports = router;

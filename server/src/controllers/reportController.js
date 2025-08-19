@@ -1,4 +1,4 @@
-// src/controllers/reportController.js
+// server/src/controllers/reportController.js
 const asyncHandler = require('express-async-handler');
 const Report = require('../models/Report');
 
@@ -24,53 +24,39 @@ const createReport = asyncHandler(async (req, res) => {
 
   const createdReport = await report.save();
 
-  // --- DEBUGGING LOGS ---
-  console.log('Report saved to DB:', createdReport._id);
-  if (req.io) {
-    console.log('Socket.IO is available. Broadcasting newReport event...');
-    
-    const publicReportData = {
-      _id: createdReport._id,
-      description: createdReport.description,
-      status: createdReport.status,
-      location: createdReport.location,
-      createdAt: createdReport.createdAt,
-    };
-
-    req.io.emit('newReport', publicReportData);
-    
-    console.log('Broadcast sent.');
-  } else {
-    console.error('ERROR: Socket.IO (req.io) is NOT available on the request object.');
-  }
-  // --- END OF DEBUGGING ---
-
+  // Populate user info to send with the event
+  const reportWithUser = await Report.findById(createdReport._id).populate('user', 'name');
+  
+  // --- IMPORTANT LOG FOR DEBUGGING ---
+  console.log('--- Emitting "newReport" event to all clients ---');
+  req.io.emit('newReport', reportWithUser);
+  
   res.status(201).json(createdReport);
 });
 
-// @desc    Get reports for the logged-in user
-// @route   GET /api/reports/myreports
-// @access  Private
+// ... (The rest of the file is unchanged) ...
 const getUserReports = asyncHandler(async (req, res) => {
   const reports = await Report.find({ user: req.user._id }).sort({ createdAt: -1 });
   res.json(reports);
 });
 
-// @desc    Get all reports
-// @route   GET /api/reports
-// @access  Private/Admin
+const getPublicReports = asyncHandler(async (req, res) => {
+  const expirationHours = process.env.REPORT_EXPIRATION_HOURS || 24;
+  const cutoffDate = new Date(Date.now() - expirationHours * 60 * 60 * 1000);
+  const reports = await Report.find({ createdAt: { $gte: cutoffDate } })
+    .populate('user', 'name')
+    .sort({ createdAt: -1 });
+  res.json(reports);
+});
+
 const getAllReports = asyncHandler(async (req, res) => {
   const reports = await Report.find({}).populate('user', 'id name').sort({ createdAt: -1 });
   res.json(reports);
 });
 
-// @desc    Update a report's status
-// @route   PUT /api/reports/:id/status
-// @access  Private/Admin
 const updateReportStatus = asyncHandler(async (req, res) => {
   const { status } = req.body;
   const report = await Report.findById(req.params.id);
-
   if (report) {
     report.status = status || report.status;
     const updatedReport = await report.save();
@@ -81,19 +67,10 @@ const updateReportStatus = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Get all submitted reports for public map display
-// @route   GET /api/reports/public
-// @access  Public
-const getPublicReports = asyncHandler(async (req, res) => {
-  const reports = await Report.find({ status: { $in: ['Submitted', 'In Review'] } })
-                              .select('location description status createdAt');
-  res.json(reports);
-});
-
 module.exports = {
   createReport,
   getUserReports,
+  getPublicReports,
   getAllReports,
   updateReportStatus,
-  getPublicReports,
 };
