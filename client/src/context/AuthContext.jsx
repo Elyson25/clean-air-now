@@ -1,37 +1,66 @@
 // client/src/context/AuthContext.jsx
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import io from 'socket.io-client';
 
-// 1. Create the context
+const SOCKET_SERVER_URL = "http://localhost:5000";
+
 const AuthContext = createContext(null);
 
-// 2. Create the AuthProvider component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // To check initial auth status
+  const [isLoading, setIsLoading] = useState(true);
+  const [socket, setSocket] = useState(null);
 
-  // This effect runs once on mount to check if a token exists
+  // Effect to check for existing user in localStorage on initial load
   useEffect(() => {
-    if (token) {
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
       try {
-        // In a real app, you would verify the token with the backend here.
-        // For now, we'll trust the token if it exists and get user data from localStorage.
         const storedUser = JSON.parse(localStorage.getItem('user'));
         if (storedUser) {
           setUser(storedUser);
+          setToken(storedToken);
           setIsAuthenticated(true);
         }
-      // eslint-disable-next-line no-unused-vars
       } catch (error) {
-        // If token is invalid or user data is corrupt, log out
+        // If data is corrupt, clear it
         logout();
       }
     }
-    setIsLoading(false); // Finished initial check
-  }, [token]);
+    setIsLoading(false);
+  }, []);
 
-  // Login function
+  // Effect to manage the socket connection based on authentication status
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log('AuthContext: User is authenticated. Attempting to connect socket...');
+      const newSocket = io(SOCKET_SERVER_URL);
+
+      newSocket.on('connect', () => {
+        // --- THIS IS THE MOST IMPORTANT LOG ---
+        console.log(`%cAuthContext: Socket connected successfully! ID: ${newSocket.id}`, 'color: green; font-weight: bold;');
+      });
+      
+      newSocket.on('connect_error', (err) => {
+        // --- THIS LOG WILL SHOW CONNECTION ERRORS ---
+        console.error(`%cAuthContext: Socket connection error! Reason: ${err.message}`, 'color: red; font-weight: bold;');
+      });
+
+      setSocket(newSocket);
+
+      // Cleanup function: runs when the user logs out
+      return () => {
+        console.log('AuthContext: Disconnecting socket.');
+        newSocket.disconnect();
+        setSocket(null);
+      };
+    } else {
+      console.log('AuthContext: User is not authenticated. Socket not connected.');
+    }
+  }, [isAuthenticated]); // Dependency: runs when isAuthenticated changes
+
   const login = (userData) => {
     localStorage.setItem('token', userData.token);
     localStorage.setItem('user', JSON.stringify(userData));
@@ -40,7 +69,6 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(true);
   };
 
-  // Logout function
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -49,17 +77,16 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
-  // The value that will be available to all consuming components
   const value = {
     user,
     token,
     isAuthenticated,
     isLoading,
+    socket, // Expose socket through the context
     login,
     logout,
   };
   
-  // We don't render children until the initial loading check is complete
   return (
     <AuthContext.Provider value={value}>
       {!isLoading && children}
@@ -67,8 +94,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// 3. Create a custom hook for easy access to the context
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   return useContext(AuthContext);
 };

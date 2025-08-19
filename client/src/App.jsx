@@ -7,51 +7,38 @@ import { Toaster } from 'react-hot-toast';
 import HomePage from './pages/HomePage';
 import AuthPage from './pages/AuthPage';
 import DashboardPage from './pages/DashboardPage';
-import AdminDashboardPage from './pages/AdminDashboardPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
+import AdminPage from './pages/AdminPage';
 
-// Import Components and Utils
+// Import Components
 import Navbar from './components/Navbar';
-import AdminRoute from './utils/AdminRoute';
-import ProtectedRoute from './utils/ProtectedRoute';
-import GuestRoute from './utils/GuestRoute';
+import ProtectedRoute from './components/ProtectedRoute'; // Import our new component
+import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 
 function App() {
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <Router>
-        <Navbar />
-        <Toaster
-          position="top-center"
-          reverseOrder={false}
-        />
-        <main>
-          <Routes>
-            {/* --- Public Route --- */}
-            <Route path="/" element={<HomePage />} />
+    <Router>
+      <Navbar />
+      <Toaster position="top-center" reverseOrder={false} />
+      <main>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/auth" element={<AuthPage />} />
 
-            {/* --- Guest-Only Routes --- */}
-            <Route element={<GuestRoute />}>
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-            </Route>
+          {/* Protected User Routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+            {/* Any other user-only pages would go here */}
+          </Route>
 
-            {/* --- User Protected Routes --- */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/dashboard" element={<DashboardPage />} />
-            </Route>
+          {/* Protected Admin Routes */}
+          <Route element={<ProtectedAdminRoute />}>
+            <Route path="/admin" element={<AdminPage />} />
+          </Route>
 
-            {/* --- Admin Protected Routes --- */}
-            <Route element={<AdminRoute />}>
-              <Route path="/admin" element={<AdminDashboardPage />} />
-            </Route>
-            
-          </Routes>
-        </main>
-      </Router>
-    </div>
+        </Routes>
+      </main>
+    </Router>
   );
 }
 

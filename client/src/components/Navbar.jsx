@@ -1,4 +1,3 @@
-// client/src/components/Navbar.jsx
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -9,40 +8,36 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/'); // Redirect to homepage after logout
+    navigate('/');
   };
 
   return (
-    <header className="bg-slate-100 shadow-md flex justify-between items-center p-4">
-      <h1 className="text-2xl font-bold text-gray-800">
-        <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+    <header className="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50 shadow-sm">
+      <h1 className="text-2xl font-bold">
+        <Link to="/" className="text-gray-800 no-underline">
           Clean Air Now
         </Link>
       </h1>
       <nav>
-        {isAuthenticated && user ? (
-          // --- LOGGED-IN VIEW ---
+        {isAuthenticated && user ? ( // Check for user object
           <div className="flex items-center gap-4">
-            <span className="text-gray-700">Welcome, {user.name}!</span>
+            <span>Welcome, {user.name}!</span>
             
-            {/* Conditional Admin Link */}
+            {/* --- Admin Link --- */}
             {user.isAdmin && (
-              <Link to="/admin" className="text-red-600 font-bold hover:underline">Admin</Link>
+              <Link to="/admin" className="text-red-600 font-bold hover:underline">
+                Admin Panel
+              </Link>
             )}
 
             <Link to="/dashboard" className="text-blue-600 hover:underline">Dashboard</Link>
-            
-            <button 
-              onClick={handleLogout} 
-              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
-            >
+            <button onClick={handleLogout} className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">
               Logout
             </button>
           </div>
         ) : (
-          // --- LOGGED-OUT VIEW ---
           <div>
-            <Link to="/auth" className="text-blue-600 hover:underline font-semibold">
+            <Link to="/auth" className="text-blue-600 font-bold hover:underline">
               Login / Register
             </Link>
           </div>

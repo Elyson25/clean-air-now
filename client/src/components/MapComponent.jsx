@@ -1,9 +1,9 @@
 // client/src/components/MapComponent.jsx
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import axios from 'axios';
 import L from 'leaflet';
-import toast from 'react-hot-toast'; // Import toast for the notification
+import toast from 'react-hot-toast';
 
 // FIX for default icon issue with React-Leaflet
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -17,9 +17,26 @@ L.Icon.Default.mergeOptions({
 });
 // End of FIX
 
-const MapComponent = ({ onMapClick, socket }) => {
+// Define our custom blue dot icon
+const liveLocationIcon = new L.divIcon({
+  className: 'live-location-icon',
+  iconSize: [18, 18],
+});
+
+// Helper component to recenter the map view
+const ChangeView = ({ center, zoom }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(center, zoom);
+  }, [center, zoom, map]);
+  return null;
+};
+
+const MapComponent = ({ onMapClick, socket, onLocationFound }) => {
   const [position, setPosition] = useState([51.505, -0.09]);
   const [reports, setReports] = useState([]);
+  const [zoom, setZoom] = useState(5);
+  const [userHasLocation, setUserHasLocation] = useState(false);
 
   // Effect to fetch initial public reports
   useEffect(() => {
@@ -34,38 +51,52 @@ const MapComponent = ({ onMapClick, socket }) => {
     fetchPublicReports();
   }, []);
 
-  // Effect to listen for real-time updates
+  // Effect to listen for real-time updates from Socket.IO
   useEffect(() => {
     if (socket) {
-      console.log('MapComponent: Socket is available. Setting up listener for "newReport".');
-
       socket.on('newReport', (newReport) => {
-        // --- THIS IS THE MOST IMPORTANT LOG ---
-        console.log('<<<<< REAL-TIME EVENT RECEIVED! >>>>>', newReport);
-        // --- END OF LOG ---
-        
-        toast.success('New incident reported nearby!');
+        toast.success('New incident reported!');
         setReports(prevReports => [newReport, ...prevReports]);
       });
     }
-    
-    // Cleanup function to remove the listener
     return () => {
       if (socket) {
-        console.log('MapComponent: Cleaning up "newReport" listener.');
         socket.off('newReport');
       }
     };
   }, [socket]);
 
-  // Effect to get user's location (unchanged)
+  // Effect to get the user's initial location with high accuracy
   useEffect(() => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser.");
+      return;
+    }
+    const options = { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 };
     navigator.geolocation.getCurrentPosition(
-      (pos) => setPosition([pos.coords.latitude, pos.coords.longitude]),
-      () => console.log("Could not get user location, using default.")
+      (pos) => {
+        const newPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        setPosition([newPos.lat, newPos.lng]);
+        setZoom(13);
+        setUserHasLocation(true);
+        toast.success("Your location has been found!");
+        if (onLocationFound) {
+          onLocationFound(newPos);
+        }
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        if (error.code === error.PERMISSION_DENIED) {
+          toast.error("Location access was denied. Please enable it in your browser settings.");
+        } else {
+          toast.error("Could not get your location. Please ensure location services are on.");
+        }
+      },
+      options
     );
-  }, []);
+  }, [onLocationFound]);
 
+  // Helper component to handle map click events
   const MapClickHandler = () => {
     useMapEvents({ click: (e) => onMapClick(e.latlng) });
     return null;
@@ -73,12 +104,18 @@ const MapComponent = ({ onMapClick, socket }) => {
 
   return (
     <div className="h-96 w-full shadow-lg rounded-lg overflow-hidden">
-      <MapContainer center={position} zoom={10} style={{ height: '100%', width: '100%' }} key={position.toString()}>
+      <MapContainer center={position} zoom={zoom} style={{ height: '100%', width: '100%' }}>
+        <ChangeView center={position} zoom={zoom} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <MapClickHandler />
+        {userHasLocation && (
+          <Marker position={position} icon={liveLocationIcon}>
+            <Popup>You are here! (Approximate location)</Popup>
+          </Marker>
+        )}
         {reports.map((report) => (
           <Marker
             key={report._id}
@@ -87,7 +124,8 @@ const MapComponent = ({ onMapClick, socket }) => {
             <Popup>
               <strong>Status: {report.status}</strong>
               <p>{report.description}</p>
-              <small>Reported on: {new Date(report.createdAt).toLocaleDateString()}</small>
+              <p>Reported by: {report.user ? report.user.name : 'Anonymous'}</p>
+              <small>Submitted on: {new Date(report.createdAt).toLocaleDateString()}</small>
             </Popup>
           </Marker>
         ))}

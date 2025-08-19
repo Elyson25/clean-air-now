@@ -1,45 +1,60 @@
+// client/src/components/AQIDisplay.jsx
 import React from 'react';
 
 const aqiLevels = {
-  1: { text: 'Good', color: 'text-green-500', borderColor: 'border-green-500' },
-  2: { text: 'Fair', color: 'text-yellow-500', borderColor: 'border-yellow-500' },
-  3: { text: 'Moderate', color: 'text-orange-500', borderColor: 'border-orange-500' },
-  4: { text: 'Poor', color: 'text-red-500', borderColor: 'border-red-500' },
-  5: { text: 'Very Poor', color: 'text-purple-700', borderColor: 'border-purple-700' },
+  1: { text: 'Good', color: '#28a745' },
+  2: { text: 'Fair', color: '#a3c853' },
+  3: { text: 'Moderate', color: '#ffc107' },
+  4: { text: 'Poor', color: '#fd7e14' },
+  5: { text: 'Very Poor', color: '#dc3545' },
 };
 
-const AQIDisplay = ({ data }) => {
+const AQIDisplay = ({ data, isLoading }) => {
+  if (isLoading) {
+    return (
+      <div className="border border-gray-300 p-5 rounded-lg max-w-lg mx-auto mb-6 bg-white text-center">
+        <p>Fetching Air Quality Data...</p>
+      </div>
+    );
+  }
+
   if (!data || !data.list || data.list.length === 0) {
-    return null; // Don't render if no data
+    return (
+        <div className="border border-gray-300 p-5 rounded-lg max-w-lg mx-auto mb-6 bg-white text-center">
+          <p>Click the map to check the Air Quality Index for any location.</p>
+        </div>
+      );
   }
 
   const aqiData = data.list[0];
   const aqiValue = aqiData.main.aqi;
-  const level = aqiLevels[aqiValue] || { text: 'Unknown', color: 'text-gray-500' };
+  const level = aqiLevels[aqiValue] || { text: 'Unknown', color: '#ccc' };
   const components = aqiData.components;
 
   return (
-    <div className={`bg-white p-6 rounded-lg shadow-md border-2 ${level.borderColor}`}>
-      <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">Current Air Quality</h3>
-      <div className="flex items-center justify-center gap-4">
-        <div className={`text-6xl font-bold ${level.color}`}>
-          {aqiValue}
+    <div className="border-2 rounded-lg max-w-lg mx-auto mb-6 bg-white shadow" style={{ borderColor: level.color }}>
+      <div className="p-4">
+        <h3 className="text-lg font-semibold text-center">Current Air Quality</h3>
+        <div className="flex items-center justify-center gap-4 my-3">
+          <div className="text-5xl font-bold" style={{ color: level.color }}>
+            {aqiValue}
+          </div>
+          <div className="text-xl">
+            <div className="font-bold" style={{ color: level.color }}>{level.text}</div>
+            <div>Air Quality Index</div>
+          </div>
         </div>
-        <div className="text-lg">
-          <div className={`font-bold ${level.color}`}>{level.text}</div>
-          <div className="text-gray-500">Air Quality Index</div>
-        </div>
+        <hr className="my-2" />
+        <h4 className="font-semibold text-center">Main Pollutants (μg/m³)</h4>
+        <ul className="list-none p-0 mt-2">
+          {Object.entries(components).map(([key, value]) => (
+            <li key={key} className="flex justify-between py-1 px-2 odd:bg-gray-50">
+              <span>{key.replace('_', '.').toUpperCase()}</span>
+              <strong>{value}</strong>
+            </li>
+          ))}
+        </ul>
       </div>
-      <hr className="my-4" />
-      <h4 className="font-bold text-gray-700 mb-2">Main Pollutants (μg/m³)</h4>
-      <ul className="space-y-2">
-        {Object.entries(components).map(([key, value]) => (
-          <li key={key} className="flex justify-between items-center text-gray-600">
-            <span className="font-mono text-sm">{key.replace('_', '.').toUpperCase()}</span>
-            <strong className="text-gray-800">{value}</strong>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 };
