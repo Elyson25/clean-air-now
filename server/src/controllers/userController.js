@@ -1,14 +1,13 @@
-// src/controllers/userController.js
+// server/src/controllers/userController.js
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
+const sendEmail = require('../utils/sendEmail');
 
+// Helper function to generate JWT
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '30d',
-  });
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
 
 // @desc    Register a new user
@@ -17,14 +16,11 @@ const generateToken = (id) => {
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
   const userExists = await User.findOne({ email });
-
   if (userExists) {
     res.status(400);
     throw new Error('User already exists');
   }
-
   const user = await User.create({ name, email, password });
-
   if (user) {
     res.status(201).json({
       _id: user._id,
@@ -45,7 +41,6 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
-
   if (user && (await user.matchPassword(password))) {
     res.json({
       _id: user._id,
@@ -60,90 +55,45 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Get user profile
-// @route   GET /api/users/profile
-// @access  Private
-const getUserProfile = asyncHandler(async (req, res) => {
-  res.json({
-    _id: req.user._id,
-    name: req.user.name,
-    email: req.user.email,
-    isAdmin: req.user.isAdmin,
-  });
-});
-
-// @desc    Get all users
-// @route   GET /api/users
-// @access  Private/Admin
-const getAllUsers = asyncHandler(async (req, res) => {
-  const users = await User.find({}).select('-password');
-  res.json(users);
-});
-
-// @desc    Forgot password
-// @route   POST /api/users/forgot-password
+// @desc    Handle forgot password request
+// @route   POST /api/users/forgotpassword
 // @access  Public
 const forgotPassword = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
-
   if (!user) {
-    return res.status(200).json({ message: 'If an account with that email exists, a reset link has been sent.' });
+    res.status(404);
+    throw new Error('There is no user with that email');
   }
+  const resetToken = user.getPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
 
-  const resetToken = crypto.randomBytes(20).toString('hex');
-  user.passwordResetToken = resetToken;
-  user.passwordResetExpires = Date.now() + 10 * 60 * 1000; // Expires in 10 minutes
-  await user.save();
-
-  const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
-
-  // --- DEBUGGING BLOCK ---
+  const resetUrl = `${process.env.FRONTEND_URL}/resetpassword/${resetToken}`;
+  const message = `You are receiving this email because you requested a password reset. Please click the link below to complete the process (link is valid for 10 minutes):\n\n${resetUrl}`;
+  
   try {
-    console.log('Attempting to create email transport...');
-    console.log('Using Host:', process.env.EMAIL_HOST);
-    console.log('Using User:', process.env.EMAIL_USER);
-
-    const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-      // Optional: Add this for more detailed logs from nodemailer
-      logger: true,
-      debug: true 
+    await sendEmail({
+      email: user.email,
+      subject: 'Password Reset Token - Clean Air Now',
+      message,
     });
-
-    console.log('Transport created. Attempting to send email...');
-    await transporter.sendMail({
-      from: `"Clean Air Now" <noreply@cleanair.com>`,
-      to: user.email,
-      subject: 'Password Reset Request',
-      html: `<p>You requested a password reset. Please click the link below to reset your password:</p><p><a href="${resetUrl}">${resetUrl}</a></p><p>This link will expire in 10 minutes.</p>`,
-    });
-
-    console.log('Email sent successfully.');
-
-  } catch (error) {
-    // --- THIS WILL SHOW US THE EXACT PROBLEM ---
-    console.error('!!! NODEMAILER ERROR !!!:', error);
+    res.status(200).json({ success: true, data: 'Email sent' });
+  } catch (err) {
+    console.error('Email sending error:', err);
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+    res.status(500);
+    throw new Error('Email could not be sent');
   }
-  // --- END DEBUGGING BLOCK ---
-
-  res.status(200).json({ message: 'If an account with that email exists, a reset link has been sent.' });
 });
 
-// @desc    Reset password
-// @route   PUT /api/users/reset-password/:token
+// @desc    Reset user's password
+// @route   PUT /api/users/resetpassword/:resettoken
 // @access  Public
 const resetPassword = asyncHandler(async (req, res) => {
-  const resetToken = req.params.token;
-  const { password } = req.body;
-
+  const hashedToken = crypto.createHash('sha256').update(req.params.resettoken).digest('hex');
   const user = await User.findOne({
-    passwordResetToken: resetToken,
+    passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() },
   });
 
@@ -151,21 +101,43 @@ const resetPassword = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('Invalid or expired token');
   }
-
-  user.password = password;
+  
+  user.password = req.body.password;
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
   await user.save();
 
-  res.status(200).json({ message: 'Password reset successful. You can now log in.' });
+  res.status(200).json({
+    success: true,
+    token: generateToken(user._id),
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    isAdmin: user.isAdmin,
+  });
 });
 
+// @desc    Get user profile
+// @route   GET /api/users/profile
+// @access  Private
+const getUserProfile = asyncHandler(async (req, res) => {
+  res.json({ _id: req.user._id, name: req.user.name, email: req.user.email, isAdmin: req.user.isAdmin });
+});
 
+// @desc    Get all users (Admin)
+// @route   GET /api/users
+// @access  Private/Admin
+const getAllUsers = asyncHandler(async (req, res) => {
+  const users = await User.find({}).select('-password');
+  res.json(users);
+});
+
+// Export all controller functions
 module.exports = {
   registerUser,
   loginUser,
-  getUserProfile,
-  getAllUsers,
   forgotPassword,
   resetPassword,
+  getUserProfile,
+  getAllUsers,
 };

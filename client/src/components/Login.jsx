@@ -1,10 +1,10 @@
 // client/src/components/Login.jsx
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { API_URL } from '../apiConfig'; // Import the central URL
+import { API_URL } from '../apiConfig';
 
 const Login = () => {
   const { login } = useAuth();
@@ -16,7 +16,7 @@ const Login = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${API_URL}/api/users/login`, { // Use the central URL
+      const res = await axios.post(`${API_URL}/api/users/login`, {
         email: formData.email,
         password: formData.password,
       });
@@ -39,6 +39,11 @@ const Login = () => {
         <div className="mb-4">
           <label>Password</label>
           <input type="password" name="password" value={formData.password} onChange={onChange} required className="w-full p-2 border border-gray-300 rounded mt-1"/>
+        </div>
+        <div className="text-right mb-4">
+          <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
+            Forgot Password?
+          </Link>
         </div>
         <button type="submit" className="w-full p-2 bg-green-500 text-white rounded hover:bg-green-600">
           Login

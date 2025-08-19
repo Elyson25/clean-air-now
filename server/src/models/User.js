@@ -1,39 +1,22 @@
-// src/models/User.js
+// server/src/models/User.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const UserSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'Please provide a name'],
-  },
+  name: { type: String, required: [true, 'Please provide a name'] },
   email: {
     type: String,
     required: [true, 'Please provide an email'],
     unique: true,
-    match: [
-      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-      'Please provide a valid email',
-    ],
+    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email'],
   },
-  password: {
-    type: String,
-    required: [true, 'Please provide a password'],
-    minlength: 6,
-  },
-  isAdmin: {
-    type: Boolean,
-    required: true,
-    default: false,
-  },
-  // --- ADDED FIELDS ---
+  password: { type: String, required: [true, 'Please provide a password'], minlength: 6 },
+  isAdmin: { type: Boolean, required: true, default: false },
   passwordResetToken: String,
   passwordResetExpires: Date,
-}, {
-  timestamps: true,
-});
+}, { timestamps: true });
 
-// Mongoose middleware to hash password before saving
 UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     return next();
@@ -43,11 +26,16 @@ UserSchema.pre('save', async function (next) {
   next();
 });
 
-// Method to compare entered password with the hashed password
 UserSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const User = mongoose.model('User', UserSchema);
+UserSchema.methods.getPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // Expires in 10 minutes
+  return resetToken;
+};
 
+const User = mongoose.model('User', UserSchema);
 module.exports = User;
