@@ -2,8 +2,6 @@
 
 Live Application: [**https://clean-air-now.vercel.app/**](https://clean-air-now.vercel.app/)
 
-**Clean You should replace `readme-screenshot.png` with an actual screenshot of your application's dashboard)*
-
 **Clean Air Now** Air Now** is a responsive, full-stack web application designed to empower communities with real-time air quality data and a is a full-stack MERN application designed to empower communities with real-time, accessible, and actionable environmental data. It provides platform for reporting local pollution incidents. Leveraging the MERN stack, WebSockets for real-time communication, and Leaflet for interactive GIS an interactive GIS map to visualize the Air Quality Index (AQI) and allows users to report and view local pollution incidents as mapping, this project provides a centralized hub for environmental awareness and action.
 
  🌐 Live Demo
