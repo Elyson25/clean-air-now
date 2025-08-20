@@ -1,4 +1,3 @@
-// server/src/index.js
 require('dotenv').config();
 const http = require('http');
 const express = require('express');
@@ -9,9 +8,10 @@ const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const reportRoutes = require('./routes/reportRoutes');
-const historyRoutes = require('./routes/historyRoutes'); // Import history routes
+const historyRoutes = require('./routes/historyRoutes');
+const locationRoutes = require('./routes/locationRoutes'); // Import the new location routes
 const { errorHandler } = require('./middleware/errorMiddleware');
-const { handleAirQualitySockets } = require('./controllers/airQualityController');
+const { handleAirQualitySockets } = require('../controllers/airQualityController');
 
 // Connect to Database
 connectDB();
@@ -64,7 +64,8 @@ app.use('/api', limiter);
 // API Routes
 app.use('/api/users', userRoutes);
 app.use('/api/reports', reportRoutes);
-app.use('/api/history', historyRoutes); // Use the new history routes
+app.use('/api/history', historyRoutes);
+app.use('/api/locations', locationRoutes); // Use the new location routes
 
 // Socket.IO Connection Handler
 const onConnection = (socket) => {

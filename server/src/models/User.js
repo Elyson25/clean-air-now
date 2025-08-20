@@ -1,7 +1,23 @@
-// server/src/models/User.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+
+// Define a sub-schema for favorite locations.
+// This allows us to have a structured array of objects within the User document.
+const LocationSchema = new mongoose.Schema({
+  name: { type: String, required: true }, // e.g., "Home", "Work"
+  location: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      required: true,
+    },
+    coordinates: {
+      type: [Number], // Stored as [longitude, latitude]
+      required: true,
+    },
+  },
+});
 
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: [true, 'Please provide a name'] },
@@ -13,10 +29,16 @@ const UserSchema = new mongoose.Schema({
   },
   password: { type: String, required: [true, 'Please provide a password'], minlength: 6 },
   isAdmin: { type: Boolean, required: true, default: false },
+  
+  // This new field will store an array of favorite locations using the schema defined above.
+  favoriteLocations: [LocationSchema],
+
   passwordResetToken: String,
   passwordResetExpires: Date,
 }, { timestamps: true });
 
+
+// --- METHODS ---
 UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     return next();
@@ -33,7 +55,7 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
 UserSchema.methods.getPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString('hex');
   this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // Expires in 10 minutes
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
   return resetToken;
 };
 
