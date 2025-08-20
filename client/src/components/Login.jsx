@@ -1,4 +1,3 @@
-// client/src/components/Login.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -40,6 +39,7 @@ const Login = () => {
           <label>Password</label>
           <input type="password" name="password" value={formData.password} onChange={onChange} required className="w-full p-2 border border-gray-300 rounded mt-1"/>
         </div>
+        {/* --- THIS LINK MUST BE PRESENT --- */}
         <div className="text-right mb-4">
           <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
             Forgot Password?

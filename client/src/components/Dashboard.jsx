@@ -1,4 +1,3 @@
-// client/src/components/Dashboard.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import MapComponent from './MapComponent';
 import ReportForm from './ReportForm';

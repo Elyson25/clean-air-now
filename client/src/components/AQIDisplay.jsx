@@ -1,4 +1,3 @@
-// client/src/components/AQIDisplay.jsx
 import React from 'react';
 
 const aqiLevels = {
