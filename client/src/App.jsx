@@ -1,3 +1,4 @@
+// client/src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
@@ -6,8 +7,7 @@ import { Toaster } from 'react-hot-toast';
 import HomePage from './pages/HomePage';
 import AuthPage from './pages/AuthPage';
 import DashboardPage from './pages/DashboardPage';
-// import AdminPage from './pages/AdminPage';
-import AdminPage from './pages/AdminPage'; 
+import AdminPage from './pages/AdminPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 
@@ -23,18 +23,16 @@ function App() {
       <Toaster position="top-center" reverseOrder={false} />
       <main>
         <Routes>
-          {/* Public Routes */}
+          {/* --- THIS ROUTE MUST BE PRESENT --- */}
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          
+          {/* Other Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/auth" element={<AuthPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/resetpassword/:resettoken" element={<ResetPasswordPage />} />
-
-          {/* Protected User Routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
           </Route>
-
-          {/* Protected Admin Routes */}
           <Route element={<ProtectedAdminRoute />}>
             <Route path="/admin" element={<AdminPage />} />
           </Route>
