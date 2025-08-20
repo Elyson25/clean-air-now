@@ -1,8 +1,8 @@
-// src/controllers/airQualityController.js
 const axios = require('axios');
 const AirQualityLog = require('../models/AirQualityLog');
 const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
 
+// Fetches the current air quality data from the OpenWeather API
 const getAirQuality = async (lat, lon) => {
   try {
     const url = `http://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${OPENWEATHER_API_KEY}`;
@@ -14,16 +14,20 @@ const getAirQuality = async (lat, lon) => {
   }
 };
 
+// Handles the 'getAirQuality' event from a connected client
 const handleAirQualitySockets = (socket) => {
   socket.on('getAirQuality', async (coords) => {
-    console.log(`Received request for coordinates:`, coords);
     const airQualityData = await getAirQuality(coords.lat, coords.lon);
 
+    // If data is fetched successfully, log it to the database
     if (airQualityData && airQualityData.list && airQualityData.list.length > 0) {
       try {
+        // Save the log using the new GeoJSON format
         const newLog = new AirQualityLog({
-          lat: coords.lat,
-          lon: coords.lon,
+          location: {
+            type: 'Point',
+            coordinates: [coords.lon, coords.lat], // GeoJSON is [longitude, latitude]
+          },
           aqi: airQualityData.list[0].main.aqi,
         });
         await newLog.save();
@@ -33,6 +37,7 @@ const handleAirQualitySockets = (socket) => {
       }
     }
     
+    // Send the fetched data back to the client that requested it
     socket.emit('airQualityData', airQualityData);
   });
 };

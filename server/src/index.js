@@ -9,6 +9,7 @@ const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const reportRoutes = require('./routes/reportRoutes');
+const historyRoutes = require('./routes/historyRoutes'); // Import history routes
 const { errorHandler } = require('./middleware/errorMiddleware');
 const { handleAirQualitySockets } = require('./controllers/airQualityController');
 
@@ -19,16 +20,12 @@ const PORT = process.env.PORT || 5000;
 const app = express();
 
 // --- PRODUCTION CORS SETUP ---
-// Define the list of origins that are allowed to connect to our backend.
 const allowedOrigins = [
-  'https://clean-air-now.vercel.app', // Your live frontend URL
-  'http://localhost:5173'           // The URL for your local development frontend
+  'https://clean-air-now.vercel.app',
+  'http://localhost:5173'
 ];
-
-// CORS options for Express (for regular API calls like login, register)
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests that have an origin found in our allowedOrigins list
     if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
     } else {
@@ -36,14 +33,12 @@ const corsOptions = {
     }
   }
 };
-
-app.use(cors(corsOptions)); // Use the specific CORS options for Express
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const server = http.createServer(app);
 
 // --- PRODUCTION Socket.IO CORS ---
-// We use the same list of allowed origins for our real-time WebSocket connections.
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
@@ -51,13 +46,12 @@ const io = new Server(server, {
   }
 });
 
-// Middleware to make the `io` instance available on the `req` object for controllers
+// Middleware
 app.use((req, res, next) => {
   req.io = io;
   next();
 });
 
-// Rate Limiting Middleware
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -70,6 +64,7 @@ app.use('/api', limiter);
 // API Routes
 app.use('/api/users', userRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/history', historyRoutes); // Use the new history routes
 
 // Socket.IO Connection Handler
 const onConnection = (socket) => {
@@ -79,10 +74,9 @@ const onConnection = (socket) => {
     console.log(`Socket.IO: User disconnected. ID: ${socket.id}`);
   });
 };
-
 io.on('connection', onConnection);
 
-// Custom Error Handler Middleware
+// Custom Error Handler
 app.use(errorHandler);
 
 server.listen(PORT, () => {

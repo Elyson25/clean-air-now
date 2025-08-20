@@ -1,8 +1,10 @@
+// client/src/components/Dashboard.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import MapComponent from './MapComponent';
 import ReportForm from './ReportForm';
 import MyReports from './MyReports';
 import AQIDisplay from './AQIDisplay';
+import AqiHistoryChart from './AqiHistoryChart'; // --- Import the new chart component
 import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
@@ -10,16 +12,16 @@ const Dashboard = () => {
   const [mapClickCoords, setMapClickCoords] = useState(null);
   const [airQualityData, setAirQualityData] = useState(null);
   const [isAqiLoading, setIsAqiLoading] = useState(false);
+  // --- NEW STATE to hold the location for the chart ---
+  const [chartLocation, setChartLocation] = useState(null);
 
   useEffect(() => {
-    // Only set up the listener if the socket is available
     if (socket) {
       socket.on('airQualityData', (data) => {
         setAirQualityData(data);
         setIsAqiLoading(false);
       });
     }
-    // Cleanup function
     return () => {
       if (socket) {
         socket.off('airQualityData');
@@ -28,11 +30,11 @@ const Dashboard = () => {
   }, [socket]);
 
   const fetchAqiData = useCallback((latlng) => {
-    // We still check if the socket is available, but we remove the error log
-    // because we know it might not be there on the first render.
     if (socket) {
       setIsAqiLoading(true);
       setAirQualityData(null);
+      // When we fetch new AQI data, we also set the location for the history chart
+      setChartLocation(latlng);
       socket.emit('getAirQuality', { lat: latlng.lat, lon: latlng.lng });
     }
   }, [socket]);
@@ -62,6 +64,8 @@ const Dashboard = () => {
         </div>
         <div className="lg:w-1/3">
           <AQIDisplay data={airQualityData} isLoading={isAqiLoading} />
+          {/* --- RENDER THE NEW CHART COMPONENT --- */}
+          <AqiHistoryChart location={chartLocation} />
           <ReportForm mapClickCoords={mapClickCoords} />
           <MyReports />
         </div>

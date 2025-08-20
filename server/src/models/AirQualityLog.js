@@ -1,14 +1,17 @@
-// src/models/AirQualityLog.js
 const mongoose = require('mongoose');
 
 const AirQualityLogSchema = new mongoose.Schema({
-  lat: {
-    type: Number,
-    required: true,
-  },
-  lon: {
-    type: Number,
-    required: true,
+  // Store location as a GeoJSON Point for geospatial queries
+  location: {
+    type: {
+      type: String,
+      enum: ['Point'], // 'location.type' must be 'Point'
+      required: true,
+    },
+    coordinates: {
+      type: [Number], // Stored as [longitude, latitude]
+      required: true,
+    },
   },
   aqi: {
     type: Number,
@@ -17,6 +20,9 @@ const AirQualityLogSchema = new mongoose.Schema({
 }, {
   timestamps: true,
 });
+
+// Creates a special 2dsphere index that allows for efficient location-based queries.
+AirQualityLogSchema.index({ location: '2dsphere' });
 
 const AirQualityLog = mongoose.model('AirQualityLog', AirQualityLogSchema);
 
