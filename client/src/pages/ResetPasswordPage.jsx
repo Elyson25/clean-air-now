@@ -1,6 +1,5 @@
-// client/src/pages/ResetPasswordPage.jsx
 import React from 'react';
-import ResetPassword from '../components/ResetPassword'; // Import the component
+import ResetPassword from '../components/ResetPassword';
 
 const ResetPasswordPage = () => {
   return (

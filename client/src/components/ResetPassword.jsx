@@ -1,4 +1,3 @@
-// client/src/components/ResetPassword.jsx
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -10,12 +9,17 @@ const ResetPassword = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { resettoken } = useParams();
+
+  // Ensure the name here 'resettoken' matches the route in App.jsx
+  const { resettoken } = useParams(); 
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    if (!resettoken) {
+      return toast.error('Invalid or missing reset token.');
+    }
     if (password !== confirmPassword) {
       return toast.error('Passwords do not match');
     }
@@ -29,7 +33,7 @@ const ResetPassword = () => {
       login(res.data);
       navigate('/dashboard');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to reset password. The link may be invalid or expired.');
+      toast.error(err.response?.data?.message || 'Failed to reset password.');
     } finally {
       setIsSubmitting(false);
     }
