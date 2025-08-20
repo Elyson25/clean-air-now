@@ -3,13 +3,15 @@ const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
 
-// Import all functions from the controller
+// Import all necessary controller functions
 const {
   registerUser,
   loginUser,
   forgotPassword,
   resetPassword,
   getUserProfile,
+  updateUserProfile,
+  updateUserPassword,
   getAllUsers,
 } = require('../controllers/userController');
 
@@ -17,6 +19,7 @@ const { protect, admin } = require('../middleware/authMiddleware');
 const { handleValidationErrors } = require('../middleware/validationMiddleware');
 
 // --- Validation Rule Definitions ---
+
 const registerValidation = [
   body('name', 'Name is required').not().isEmpty().trim().escape(),
   body('email', 'Please include a valid email').isEmail().normalizeEmail(),
@@ -40,13 +43,35 @@ const resetPasswordValidation = [
   handleValidationErrors,
 ];
 
+const updateProfileValidation = [
+  body('name', 'Name is required').not().isEmpty().trim().escape(),
+  body('email', 'Please include a valid email').isEmail().normalizeEmail(),
+  handleValidationErrors,
+];
+
+const updatePasswordValidation = [
+  body('oldPassword', 'Old password is required').not().isEmpty(),
+  body('newPassword', 'New password must be 6 or more characters').isLength({ min: 6 }),
+  handleValidationErrors,
+];
+
+
 // --- Route Definitions ---
+
+// Public Routes
 router.post('/register', registerValidation, registerUser);
 router.post('/login', loginValidation, loginUser);
 router.post('/forgotpassword', forgotPasswordValidation, forgotPassword);
 router.put('/resetpassword/:resettoken', resetPasswordValidation, resetPassword);
 
-router.get('/profile', protect, getUserProfile);
+// Protected User Routes
+router.route('/profile')
+  .get(protect, getUserProfile)
+  .put(protect, updateProfileValidation, updateUserProfile);
+  
+router.put('/updatepassword', protect, updatePasswordValidation, updateUserPassword);
+
+// Protected Admin Route
 router.get('/', protect, admin, getAllUsers); // Admin route to get all users
 
 module.exports = router;
