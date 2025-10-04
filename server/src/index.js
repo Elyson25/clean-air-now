@@ -4,27 +4,21 @@ const express = require('express');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
-// Importing necessary modules and routes
-// Paths should start with './' to look inside the current 'src' directory
+
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const historyRoutes = require('./routes/historyRoutes');
-const locationRoutes = require('./routes/locationRoutes');
 const { errorHandler } = require('./middleware/errorMiddleware');
 const { handleAirQualitySockets } = require('./controllers/airQualityController');
-const { initializeAlertScheduler } = require('./utils/alertScheduler');
 
 // Connect to Database
 connectDB();
 
-// Start the Alert Scheduler
-initializeAlertScheduler();
-
 const PORT = process.env.PORT || 5000;
 const app = express();
 
-// --- CORS and other middleware ---
+// --- Middleware ---
 const allowedOrigins = [ 'https://clean-air-now.vercel.app', 'http://localhost:5173' ];
 const corsOptions = {
   origin: function (origin, callback) {
@@ -49,13 +43,12 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// --- API Routes (unchanged) ---
+// --- API Routes ---
 app.use('/api/users', userRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/history', historyRoutes);
-app.use('/api/locations', locationRoutes);
 
-// --- Socket.IO, Error Handler, Server Listen (unchanged) ---
+// --- Socket.IO, Error Handler, Server Listen ---
 const onConnection = (socket) => {
   console.log(`Socket.IO: A user has connected! ID: ${socket.id}`);
   handleAirQualitySockets(socket);
