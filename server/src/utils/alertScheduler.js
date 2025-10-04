@@ -6,7 +6,7 @@ const sendEmail = require('./sendEmail');
 const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
 const AQI_ALERT_THRESHOLD = parseInt(process.env.AQI_ALERT_THRESHOLD || '4', 10);
 
-// Helper function to get AQI for a single location
+// Helper function to get AQI for given coordinates
 const getAqiForLocation = async (longitude, latitude) => {
   try {
     const url = `http://api.openweathermap.org/data/2.5/air_pollution?lat=${latitude}&lon=${longitude}&appid=${OPENWEATHER_API_KEY}`;
@@ -21,61 +21,49 @@ const getAqiForLocation = async (longitude, latitude) => {
   }
 };
 
-// The main task to be scheduled
+// The main task to check air quality and send alerts
 const checkAirQualityAndSendAlerts = async () => {
   console.log('Running scheduled job: Checking air quality for user alerts...');
-
   try {
-    // Find all users who have at least one favorite location
     const users = await User.find({ 'favoriteLocations.0': { $exists: true } });
-
     if (users.length === 0) {
       console.log('No users with favorite locations. Skipping alert check.');
       return;
     }
-
-    // Process all users concurrently for efficiency
     const promises = users.map(async (user) => {
       for (const loc of user.favoriteLocations) {
         const [longitude, latitude] = loc.location.coordinates;
         const currentAqi = await getAqiForLocation(longitude, latitude);
-
         if (currentAqi && currentAqi >= AQI_ALERT_THRESHOLD) {
           console.log(`ALERT: AQI is ${currentAqi} for user ${user.email} at location "${loc.name}". Sending email.`);
-          
-          const message = `This is an alert from Clean Air Now.
-The current Air Quality Index (AQI) at your saved location "${loc.name}" is ${currentAqi}, which is considered Poor or worse.
-It is recommended to reduce strenuous activities outdoors.
-- 1 = Good
-- 2 = Fair
-- 3 = Moderate
-- 4 = Poor
-- 5 = Very Poor`;
-
-          await sendEmail({
-            email: user.email,
-            subject: `💨 Air Quality Alert for ${loc.name}`,
-            message,
-          });
+          const message = `This is an alert from Clean Air Now...\n[Your email message content]`;
+          await sendEmail({ email: user.email, subject: `💨 Air Quality Alert for ${loc.name}`, message });
         }
       }
     });
-
     await Promise.all(promises);
-    console.log('Finished scheduled job for user alerts.');
+    console.log('Finished scheduled job successfully.');
   } catch (error) {
-    console.error('Error during scheduled alert check:', error);
+    // We log the error, but we DO NOT let it crash the server.
+    console.error('CRITICAL ERROR during scheduled alert check:', error);
   }
 };
 
 // The function that initializes the scheduler
 const initializeAlertScheduler = () => {
   // Cron expression for "at minute 0 of every hour"
-  // For testing, you can change this to '* * * * *' to run every minute
-  cron.schedule('0 * * * *', checkAirQualityAndSendAlerts);
+  console.log('Initializing air quality alert scheduler to run hourly...');
+  
+  cron.schedule('0 * * * *', () => {
+    // Wrap the call in a try-catch as an extra layer of safety within the cron job itself.
+    try {
+      checkAirQualityAndSendAlerts();
+    } catch (e) {
+      console.error('FATAL ERROR inside cron.schedule callback:', e);
+    }
+  });
 
-  console.log('✅ Air quality alert scheduler initialized. Will run at the top of every hour.');
+  console.log('✅ Air quality alert scheduler is now running.');
 };
-
 
 module.exports = { initializeAlertScheduler };
