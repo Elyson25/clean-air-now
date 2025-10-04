@@ -1,4 +1,3 @@
-// client/src/context/AuthContext.jsx
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import io from 'socket.io-client';
 import { API_URL } from '../apiConfig'; // Import the central URL

@@ -1,4 +1,3 @@
-// client/src/pages/AdminPage.jsx
 import React from 'react';
 import AdminReportsTable from '../components/AdminReportsTable'; // Import the new component
 

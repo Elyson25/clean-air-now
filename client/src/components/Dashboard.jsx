@@ -12,6 +12,7 @@ const Dashboard = () => {
   const [airQualityData, setAirQualityData] = useState(null);
   const [isAqiLoading, setIsAqiLoading] = useState(false);
   const [chartLocation, setChartLocation] = useState(null);
+  const [showNasaLayer, setShowNasaLayer] = useState(false);
 
   useEffect(() => {
     if (socket) {
@@ -20,27 +21,28 @@ const Dashboard = () => {
         setIsAqiLoading(false);
       });
     }
-    return () => { if (socket) { socket.off('airQualityData'); } };
+    return () => {
+      if (socket) {
+        socket.off('airQualityData');
+      }
+    };
   }, [socket]);
 
   const fetchAqiData = useCallback((latlng) => {
     if (socket) {
       setIsAqiLoading(true);
       setAirQualityData(null);
-      // --- IMPORTANT: Set the chart location HERE ---
       setChartLocation(latlng);
       socket.emit('getAirQuality', { lat: latlng.lat, lon: latlng.lng });
     }
   }, [socket]);
 
   const handleMapClick = useCallback((latlng) => {
-    console.log("Dashboard: Map clicked. Setting location for chart:", latlng);
     setMapClickCoords(latlng);
     fetchAqiData(latlng);
   }, [fetchAqiData]);
 
   const handleLocationFound = useCallback((latlng) => {
-    console.log("Dashboard: User location found. Setting location for chart:", latlng);
     fetchAqiData(latlng);
   }, [fetchAqiData]);
 
@@ -51,17 +53,29 @@ const Dashboard = () => {
         <p className="text-gray-600">View community reports and check the AQI by clicking the map.</p>
       </div>
       <div className="flex flex-col lg:flex-row gap-6">
-        <div className="flex-grow w-full lg:w-2-3">
+        <div className="flex-grow w-full lg:w-2/3">
+          <div className="bg-white p-2 rounded-md shadow-md mb-2 flex items-center justify-end">
+            <label htmlFor="nasa-toggle" className="mr-3 text-sm font-medium text-gray-700">
+              Show NASA Aerosol Layer
+            </label>
+            <input
+              type="checkbox"
+              id="nasa-toggle"
+              checked={showNasaLayer}
+              onChange={() => setShowNasaLayer(!showNasaLayer)}
+              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+            />
+          </div>
           <MapComponent 
             onMapClick={handleMapClick} 
             onLocationFound={handleLocationFound}
             socket={socket} 
+            showNasaLayer={showNasaLayer}
           />
         </div>
         <div className="w-full lg:w-1/3">
           <AQIDisplay data={airQualityData} isLoading={isAqiLoading} />
-          {/* We only render the chart if there's a location to check */}
-          {chartLocation && <AqiHistoryChart location={chartLocation} />}
+          <AqiHistoryChart location={chartLocation} />
           <ReportForm mapClickCoords={mapClickCoords} />
           <MyReports />
         </div>

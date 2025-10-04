@@ -1,4 +1,3 @@
-// server/src/controllers/reportController.js
 const asyncHandler = require('express-async-handler');
 const Report = require('../models/Report');
 

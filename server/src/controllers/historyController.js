@@ -1,4 +1,3 @@
-// server/src/controllers/historyController.js
 const asyncHandler = require('express-async-handler');
 const AirQualityLog = require('../models/AirQualityLog');
 

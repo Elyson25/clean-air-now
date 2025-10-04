@@ -1,4 +1,3 @@
-// client/src/pages/DashboardPage.jsx
 import React from 'react';
 import Dashboard from '../components/Dashboard'; // Correct path
 

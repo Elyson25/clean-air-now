@@ -1,4 +1,3 @@
-// client/src/pages/ForgotPasswordPage.jsx
 import React from 'react';
 import ForgotPassword from '../components/ForgotPassword'; // Import the component
 
