@@ -1,12 +1,32 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* --- NEW CSS FOR THE LIVE LOCATION MARKER --- */
+/* 
+  This new CSS sets up a flexible layout for the entire application,
+  allowing the main content area to grow and fill the screen height.
+*/
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9fafb; /* Tailwind's gray-50 */
+}
 
-/* The main blue dot */
+/* This targets the <main> element in App.jsx */
+main {
+  flex-grow: 1; /* Allows this element to grow and take up remaining space */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 
+  The custom CSS for the live location marker (unchanged).
+*/
 .live-location-icon {
-  background-color: #3b82f6; /* A nice blue color */
+  background-color: #3b82f6;
   border-radius: 50%;
   width: 18px;
   height: 18px;
@@ -14,7 +34,6 @@
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
-/* The pulsating animation */
 .live-location-icon::before {
   content: '';
   position: absolute;
