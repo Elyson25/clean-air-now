@@ -1,4 +1,3 @@
-// server/src/index.js
 require('dotenv').config();
 const http = require('http');
 const express = require('express');
@@ -10,18 +9,16 @@ const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const historyRoutes = require('./routes/historyRoutes');
-const locationRoutes = require('./routes/locationRoutes');
 const { errorHandler } = require('./middleware/errorMiddleware');
 const { handleAirQualitySockets } = require('./controllers/airQualityController');
-const { initializeAlertScheduler } = require('./utils/alertScheduler');
 
+// Connect to Database
 connectDB();
-initializeAlertScheduler();
 
 const PORT = process.env.PORT || 5000;
 const app = express();
 
-// This tells Express to trust the proxy that Render uses. It is required for rate-limiting in production.
+// --- TRUST PROXY SETTING (CRITICAL FIX) ---
 app.set('trust proxy', 1);
 
 const allowedOrigins = [ 'https://clean-air-now.vercel.app', 'http://localhost:5173' ];
@@ -48,11 +45,12 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
+// API Routes
 app.use('/api/users', userRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/history', historyRoutes);
-app.use('/api/locations', locationRoutes);
 
+// Socket.IO Connection Handler
 const onConnection = (socket) => {
   console.log(`Socket.IO: A user has connected! ID: ${socket.id}`);
   handleAirQualitySockets(socket);
@@ -61,6 +59,8 @@ const onConnection = (socket) => {
   });
 };
 io.on('connection', onConnection);
+
+// Custom Error Handler
 app.use(errorHandler);
 
 server.listen(PORT, () => {
