@@ -5,12 +5,15 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
+// Database connection
 const connectDB = require('./config/db');
+
+// Route files
 const userRoutes = require('./routes/userRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const historyRoutes = require('./routes/historyRoutes');
 const { errorHandler } = require('./middleware/errorMiddleware');
-const { handleAirQualitySockets } = require('../controllers/airQualityController');
+const { handleAirQualitySockets } = require('./controllers/airQualityController');
 
 connectDB();
 
@@ -19,7 +22,7 @@ const app = express();
 
 app.set('trust proxy', 1);
 
-// CORS Configuration
+// --- SIMPLE AND ROBUST CORS SETUP ---
 app.use(cors());
 
 app.use(express.json());
@@ -29,7 +32,7 @@ const server = http.createServer(app);
 // --- SOCKET.IO CORS TO MATCH ---
 const io = new Server(server, {
   cors: {
-    origin: "*", // Allow all origins for Socket.IO
+    origin: "*",
     methods: ["GET", "POST"]
   }
 });
