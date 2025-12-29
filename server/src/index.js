@@ -19,17 +19,18 @@ const PORT = process.env.PORT || 5000;
 const app = express();
 
 // --- TRUST PROXY SETTING ---
-// Required for express-rate-limit to work correctly behind a proxy like Render.
 app.set('trust proxy', 1);
 
-// --- PRODUCTION CORS SETUP ---
+// --- CORS CONFIGURATION ---
 const allowedOrigins = [
-  'https://clean-air-now.vercel.app',
-  'http://localhost:5173'
+  'https://clean-air-now.vercel.app',                                       // Your main production URL
+  'https://clean-air-fpuky51k2-eliud8790-2172s-projects.vercel.app', // The specific preview URL from the error log
+  'http://localhost:5173'                                                    // Your local development URL
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
+    // Allow requests that are in our list or have no origin (like Postman or mobile apps)
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -47,11 +48,12 @@ const server = http.createServer(app);
 // --- SOCKET.IO CORS ---
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: allowedOrigins, // Use the same list of allowed origins
     methods: ["GET", "POST"]
   }
 });
 
+// Middleware to make the `io` instance available on the `req` object for controllers
 app.use((req, res, next) => {
   req.io = io;
   next();
