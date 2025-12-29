@@ -18,10 +18,11 @@ connectDB();
 const PORT = process.env.PORT || 5000;
 const app = express();
 
-// --- TRUST PROXY SETTING (CRITICAL FOR RATE LIMIT) ---
+// --- TRUST PROXY SETTING ---
+// Required for express-rate-limit to work correctly behind a proxy like Render.
 app.set('trust proxy', 1);
 
-// --- PRODUCTION CORS SETUP (CRITICAL FOR FRONTEND) ---
+// --- PRODUCTION CORS SETUP ---
 const allowedOrigins = [
   'https://clean-air-now.vercel.app',
   'http://localhost:5173'
@@ -37,12 +38,13 @@ const corsOptions = {
   }
 };
 
-app.use(cors(corsOptions));press API routes
+// --- MIDDLEWARE ---
+app.use(cors(corsOptions)); // Use the specific CORS options for all Express API routes
 app.use(express.json());
 
 const server = http.createServer(app);
 
-// --- PRODUCTION Socket.IO CORS ---
+// --- SOCKET.IO CORS ---
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
@@ -64,7 +66,7 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// API Routes
+// --- API ROUTES ---
 app.use('/api/users', userRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/history', historyRoutes);
@@ -82,6 +84,7 @@ io.on('connection', onConnection);
 // Custom Error Handler
 app.use(errorHandler);
 
+// Start the server
 server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
