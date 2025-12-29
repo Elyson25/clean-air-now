@@ -6,12 +6,13 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
+// --- CORRECTED IMPORT PATHS ---
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const historyRoutes = require('./routes/historyRoutes');
 const { errorHandler } = require('./middleware/errorMiddleware');
-const { handleAirQualitySockets } = require('../controllers/airQualityController');
+const { handleAirQualitySockets } = require('./controllers/airQualityController');
 
 connectDB();
 
@@ -20,16 +21,15 @@ const app = express();
 
 app.set('trust proxy', 1);
 
-// CORS Configuration
+// --- DYNAMIC PRODUCTION CORS SETUP ---
 const allowedOrigins = [
   'https://clean-air-now.vercel.app',
-  /https:\/\/clean-air-now-.*\.vercel\.app$/,
+  /https:\/\/clean-air-now-.*\.vercel\.app$/, // Regular Expression for Vercel preview URLs
   'http://localhost:5173'
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like Postman) or from our allowed list.
     if (!origin || allowedOrigins.some(pattern => 
         typeof pattern === 'string' ? pattern === origin : pattern.test(origin)
     )) {
