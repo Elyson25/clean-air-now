@@ -1,4 +1,3 @@
-// server/src/index.js
 require('dotenv').config();
 const http = require('http');
 const express = require('express');
@@ -6,13 +5,12 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
-// --- CORRECTED IMPORT PATHS ---
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const reportRoutes = require('./routes/reportRoutes');
 const historyRoutes = require('./routes/historyRoutes');
 const { errorHandler } = require('./middleware/errorMiddleware');
-const { handleAirQualitySockets } = require('./controllers/airQualityController');
+const { handleAirQualitySockets } = require('../controllers/airQualityController');
 
 connectDB();
 
@@ -21,33 +19,17 @@ const app = express();
 
 app.set('trust proxy', 1);
 
-// --- DYNAMIC PRODUCTION CORS SETUP ---
-const allowedOrigins = [
-  'https://clean-air-now.vercel.app',
-  /https:\/\/clean-air-now-.*\.vercel\.app$/, // Regular Expression for Vercel preview URLs
-  'http://localhost:5173'
-];
+// CORS Configuration
+app.use(cors());
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.some(pattern => 
-        typeof pattern === 'string' ? pattern === origin : pattern.test(origin)
-    )) {
-      callback(null, true);
-    } else {
-      callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'));
-    }
-  }
-};
-
-app.use(cors(corsOptions));
 app.use(express.json());
 
 const server = http.createServer(app);
 
+// --- SOCKET.IO CORS TO MATCH ---
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: "*", // Allow all origins for Socket.IO
     methods: ["GET", "POST"]
   }
 });
