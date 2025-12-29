@@ -1,18 +1,18 @@
 const nodemailer = require('nodemailer');
 
 const sendEmail = async (options) => {
-  // Create a transporter configured for Gmail with more explicit options.
+  // 1. Create a transporter with explicit, production-ready settings for Gmail.
   const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com', // Use the direct hostname for Gmail
-    port: 465,              // Use the standard SSL port
-    secure: true,           // Use a secure connection
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // Use SSL
     auth: {
-      user: process.env.EMAIL_USER, // Your full Gmail address from .env
-      pass: process.env.EMAIL_PASS, // Your 16-character App Password from .env
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
     },
   });
 
-  // Define the email content
+  // 2. Define the email options
   const mailOptions = {
     from: process.env.EMAIL_FROM,
     to: options.email,
@@ -20,14 +20,17 @@ const sendEmail = async (options) => {
     text: options.message,
   };
 
-  // Send the email and log the result
+  // 3. Send the email and provide detailed logging
   try {
+    console.log('Attempting to send email with nodemailer...');
     let info = await transporter.sendMail(mailOptions);
-    console.log('Real email sent successfully. Message ID:', info.messageId);
+    console.log('Email sent successfully! Message ID:', info.messageId);
   } catch (error) {
-    console.error('CRITICAL: Error sending real email:', error);
-    // Re-throw the error so the controller that called this function knows it failed
-    throw new Error('Email could not be sent due to a server configuration issue.');
+    // THIS IS THE MOST IMPORTANT LOG. It will print the exact error from Google.
+    console.error('--- NODEMAILER CRITICAL ERROR ---');
+    console.error(error);
+    console.error('--- END NODEMAILER ERROR ---');
+    throw new Error('Email could not be sent. Check server logs for details.');
   }
 };
 
