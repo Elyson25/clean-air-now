@@ -8,6 +8,9 @@ const UserList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Automatically parse your live production backend URL from Vercel's environments configuration
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
   useEffect(() => {
     const fetchUsers = async () => {
       if (!token) return;
@@ -15,7 +18,7 @@ const UserList = () => {
         const config = {
           headers: { Authorization: `Bearer ${token}` },
         };
-        const res = await axios.get('http://localhost:5000/api/users', config);
+        const res = await axios.get(`${API_BASE_URL}/api/users`, config);
         setUsers(res.data);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch users.');
@@ -24,40 +27,74 @@ const UserList = () => {
       }
     };
     fetchUsers();
-  }, [token]);
-
-  if (isLoading) return <p className="text-gray-500">Loading users...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  }, [token, API_BASE_URL]);
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">Manage Users</h2>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin Status</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {users.map((user) => (
-              <tr key={user._id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      user.isAdmin ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                    {user.isAdmin ? 'Admin' : 'User'}
+    <div className="w-full">
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className="flex flex-col items-center justify-center py-8 space-y-2">
+          <div className="h-6 w-6 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-xs font-medium text-slate-400 animate-pulse">Fetching operator keys...</p>
+        </div>
+      )}
+
+      {/* Error Banner */}
+      {error && (
+        <div className="bg-rose-50 border border-rose-100 text-rose-600 p-3 rounded-xl text-xs font-medium">
+          {error}
+        </div>
+      )}
+
+      {!isLoading && !error && (
+        <div className="divide-y divide-slate-100 max-h-[440px] overflow-y-auto pr-1 scrollbar-thin">
+          {users.map((user) => (
+            <div key={user._id} className="flex items-center justify-between py-3.5 first:pt-0 last:pb-0 group transition-all">
+              
+              {/* Profile Meta Left Block */}
+              <div className="flex items-center gap-3 min-w-0">
+                {/* Dynamically assigned colorful user circle icon */}
+                <div className={`h-9 w-9 rounded-xl flex items-center justify-center text-xs font-bold transition-all border ${
+                  user.role === 'admin' || user.isAdmin
+                    ? 'bg-indigo-50 border-indigo-100 text-indigo-700 shadow-sm' 
+                    : 'bg-slate-50 border-slate-200/60 text-slate-600'
+                }`}>
+                  {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                </div>
+                
+                {/* Profile text data stack with auto truncating to prevent layout break */}
+                <div className="flex flex-col min-w-0">
+                  <span className="text-sm font-semibold text-slate-700 truncate group-hover:text-slate-900 transition-colors">
+                    {user.name}
                   </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                  <span className="text-xs text-slate-400 truncate font-medium">
+                    {user.email}
+                  </span>
+                </div>
+              </div>
+
+              {/* Status Security Badge Right Block */}
+              <div className="ml-2 flex-shrink-0">
+                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border shadow-sm transition-all ${
+                  user.role === 'admin' || user.isAdmin
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : 'bg-slate-100 text-slate-500 border-slate-200/50'
+                }`}>
+                  {user.role === 'admin' || user.isAdmin ? 'Admin' : 'Operator'}
+                </span>
+              </div>
+
+            </div>
+          ))}
+
+          {/* Fallback Empty Database State */}
+          {users.length === 0 && (
+            <div className="text-center py-8 text-xs font-medium text-slate-400">
+              No registered user profiles found in the registry.
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
