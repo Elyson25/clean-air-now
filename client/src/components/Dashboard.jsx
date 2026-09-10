@@ -128,7 +128,7 @@ const Dashboard = () => {
 
             <div className="panel-premium-box">
               <div className="panel-header-section">
-                <h2>My Filed Inquiries Log</h2>
+                <h2>My Filled Inquiries Log</h2>
                 <p>Track investigation statuses for submissions processed from this profile node.</p>
               </div>
               <div className="panel-body-padding">
