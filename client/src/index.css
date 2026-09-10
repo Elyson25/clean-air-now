@@ -1,6 +1,8 @@
+/* ─── TAILWIND CSS INTEGRATION ─── */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 /* ─── GLOBAL SYSTEM ENGINE SETUP ─── */
 html, body, #root {
