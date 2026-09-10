@@ -29,28 +29,85 @@ const MyReports = () => {
     fetchReports();
   }, [token]);
 
-  const formatDate = (dateString) => new Date(dateString).toLocaleString();
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
-  if (isLoading) return <p className="text-center p-4">Loading your reports...</p>;
-  if (error) return <p className="text-red-500 text-center p-4">{error}</p>;
+  // Helper utility to inject specific accent line colors matching your report state
+  const getStatusBorderColor = (status) => {
+    switch (status) {
+      case 'Resolved':
+        return '#10b981'; // Sleek Emerald Green
+      case 'In Review':
+        return '#f59e0b'; // Premium Amber Yellow
+      default:
+        return '#cbd5e1'; // Clean Muted Slate
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-6 space-y-2">
+        <div className="h-5 w-5 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-xs font-medium text-slate-400 animate-pulse">Syncing personal log history...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-rose-50 border border-rose-100 text-rose-600 p-3 rounded-xl text-xs font-medium text-center">
+        {error}
+      </div>
+    );
+  }
 
   return (
-    <div className="border border-gray-300 rounded-lg max-w-lg mx-auto my-6 bg-white">
-      <h3 className="text-xl font-semibold p-4 border-b">My Submitted Reports</h3>
+    <div className="w-full">
+      {/* Header Section */}
       {reports.length === 0 ? (
-        <p className="p-4 text-center text-gray-500">You have not submitted any reports yet.</p>
+        <div className="text-center py-6 text-sm font-medium text-slate-400">
+          You have not submitted any community reports yet from this profile node.
+        </div>
       ) : (
-        <ul className="list-none p-0">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '340px', overflowY: 'auto', paddingRight: '4px' }}>
           {reports.map((report) => (
-            <li key={report._id} className="border-b last:border-b-0 p-4">
-              <p><strong>Description:</strong> {report.description}</p>
-              <p className="text-sm text-gray-600">
-                <strong>Status:</strong> {report.status} | 
-                <strong> Submitted:</strong> {formatDate(report.createdAt)}
+            <div 
+              key={report._id} 
+              className="timeline-item-card"
+              style={{ borderLeftColor: getStatusBorderColor(report.status) }}
+            >
+              {/* Description Content Summary */}
+              <p style={{ margin: 0, fontSize: '0.925rem', fontWeight: 600, color: '#334155', leadingRelaxed: '1.4' }}>
+                {report.description}
               </p>
-            </li>
+              
+              {/* Contextual Tracking Info Footer Meta Stack */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                <span 
+                  style={{ 
+                    fontSize: '0.7rem', 
+                    fontWeight: 700, 
+                    textTransform: 'uppercase', 
+                    letterSpacing: '0.05em',
+                    color: report.status === 'Resolved' ? '#059669' : report.status === 'In Review' ? '#d97706' : '#64748b'
+                  }}
+                >
+                  ● {report.status}
+                </span>
+                
+                <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 500 }}>
+                  Filed: {formatDate(report.createdAt)}
+                </span>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

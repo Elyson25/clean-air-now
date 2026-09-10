@@ -1,9 +1,9 @@
 import React from 'react';
-import Dashboard from '../components/Dashboard'; // Correct path
+import Dashboard from '../components/Dashboard';
 
 const DashboardPage = () => {
   return (
-    // You can add page-specific layout here if needed in the future
+    // Render the Dashboard component
     <Dashboard />
   );
 };

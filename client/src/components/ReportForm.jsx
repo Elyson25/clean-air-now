@@ -68,25 +68,76 @@ const ReportForm = ({ mapClickCoords }) => {
   };
 
   return (
-    <div className="border border-gray-300 p-5 rounded-lg max-w-lg mx-auto my-6 bg-white">
-      <h3 className="text-xl font-semibold mb-2">Report an Air Quality Incident</h3>
+    <div className="w-full">
+      {/* Form Header Section */}
       <form onSubmit={onSubmit}>
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Description</label>
-          <textarea name="description" value={description} onChange={onChange} required rows="4" className="w-full p-2 border border-gray-300 rounded" placeholder="Describe the incident..."></textarea>
+        
+        {/* Incident Description Area */}
+        <div style={{ marginBottom: '1.25rem' }}>
+          <label className="auth-input-label">Description</label>
+          <textarea 
+            name="description" 
+            value={description} 
+            onChange={onChange} 
+            required 
+            rows="4" 
+            className="user-premium-textarea" 
+            placeholder="Describe the environmental incident (e.g. fire, heavy smoke, dust)..."
+          ></textarea>
         </div>
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Location of Incident</label>
-          <button type="button" onClick={handleUseMyLocation} className="w-full p-2 mb-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-            Use My Current Location
+
+        {/* Geolocation Meta Section */}
+        <div style={{ marginBottom: '1.25rem' }}>
+          <label className="auth-input-label">Location Coordinates</label>
+          
+          {/* Capture Geolocation Control Button */}
+          <button 
+            type="button" 
+            onClick={handleUseMyLocation} 
+            className="btn-geo-locator"
+          >
+            📍 Use My Current Location
           </button>
-          <div className="flex gap-2">
-            <input type="number" name="latitude" value={latitude} onChange={onChange} required placeholder="Latitude" className="w-1/2 p-2 border border-gray-300 rounded" />
-            <input type="number" name="longitude" value={longitude} onChange={onChange} required placeholder="Longitude" className="w-1/2 p-2 border border-gray-300 rounded" />
+          
+          {/* Asymmetrical Coordinate Fields Split (Adapts perfectly to all smartphone screens) */}
+          <div className="geo-inputs-flex">
+            <div style={{ flex: 1 }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8' }}>Latitude</span>
+              <input 
+                type="number" 
+                name="latitude" 
+                value={latitude} 
+                onChange={onChange} 
+                required 
+                placeholder="0.00000" 
+                className="auth-premium-input" 
+                style={{ marginTop: '0.25rem' }}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8' }}>Longitude</span>
+              <input 
+                type="number" 
+                name="longitude" 
+                value={longitude} 
+                onChange={onChange} 
+                required 
+                placeholder="0.00000" 
+                className="auth-premium-input" 
+                style={{ marginTop: '0.25rem' }}
+              />
+            </div>
           </div>
         </div>
-        <button type="submit" disabled={isSubmitting} className="w-full p-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:bg-red-300">
-          {isSubmitting ? 'Submitting...' : 'Submit Report'}
+
+        {/* Submit Incident Report Button Action */}
+        <button 
+          type="submit" 
+          disabled={isSubmitting} 
+          className="btn-report-submit"
+          style={{ opacity: isSubmitting ? 0.7 : 1 }}
+        >
+          {isSubmitting ? 'Syncing submission...' : 'Submit Alert Report'}
         </button>
       </form>
     </div>
