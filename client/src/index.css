@@ -339,3 +339,18 @@ main {
   70% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
   100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
 }
+
+/* ─── 7. USER PROFILE WORKSPACE GRID ─── */
+.profile-workspace-grid {
+  display: grid;
+  grid-template-cols: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .profile-workspace-grid {
+    grid-template-cols: 1fr;
+  }
+}

@@ -33,23 +33,62 @@ const UpdatePassword = () => {
   };
 
   return (
-    <div className="border border-gray-300 p-5 rounded-lg max-w-md w-full bg-white">
-      <h2 className="text-xl font-semibold mb-4">Change Password</h2>
+    <div className="w-full">
+      {/* Form for updating user password */}
       <form onSubmit={onSubmit}>
-        <div className="mb-4">
-          <label className="block mb-1">Current Password</label>
-          <input type="password" name="oldPassword" value={oldPassword} onChange={onChange} required className="w-full p-2 border border-gray-300 rounded"/>
+        
+        {/* Current Password Field */}
+        <div className="auth-input-group">
+          <label className="auth-input-label">Current Password</label>
+          <input 
+            type="password" 
+            name="oldPassword" 
+            value={oldPassword} 
+            onChange={onChange} 
+            required 
+            className="auth-premium-input"
+            placeholder="••••••••"
+          />
         </div>
-        <div className="mb-4">
-          <label className="block mb-1">New Password</label>
-          <input type="password" name="newPassword" value={newPassword} onChange={onChange} required minLength="6" className="w-full p-2 border border-gray-300 rounded"/>
+
+        {/* New Password Field */}
+        <div className="auth-input-group">
+          <label className="auth-input-label">New Password</label>
+          <input 
+            type="password" 
+            name="newPassword" 
+            value={newPassword} 
+            onChange={onChange} 
+            required 
+            minLength="6" 
+            className="auth-premium-input"
+            placeholder="••••••••"
+          />
         </div>
-        <div className="mb-4">
-          <label className="block mb-1">Confirm New Password</label>
-          <input type="password" name="confirmNewPassword" value={confirmNewPassword} onChange={onChange} required minLength="6" className="w-full p-2 border border-gray-300 rounded"/>
+
+        {/* Confirm New Password Field */}
+        <div className="auth-input-group" style={{ marginBottom: '1.5rem' }}>
+          <label className="auth-input-label">Confirm New Password</label>
+          <input 
+            type="password" 
+            name="confirmNewPassword" 
+            value={confirmNewPassword} 
+            onChange={onChange} 
+            required 
+            minLength="6" 
+            className="auth-premium-input"
+            placeholder="••••••••"
+          />
         </div>
-        <button type="submit" disabled={isSubmitting} className="w-full p-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-green-300">
-          {isSubmitting ? 'Saving...' : 'Update Password'}
+
+        {/* Premium Action Submit Button */}
+        <button 
+          type="submit" 
+          disabled={isSubmitting} 
+          className="auth-action-btn btn-login-theme"
+          style={{ opacity: isSubmitting ? 0.7 : 1 }}
+        >
+          {isSubmitting ? 'Updating password...' : 'Update Password'}
         </button>
       </form>
     </div>
