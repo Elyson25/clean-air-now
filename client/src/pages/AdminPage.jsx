@@ -4,7 +4,7 @@ import ReportManager from '../components/ReportManager';
 
 const AdminDashboard = () => {
   return (
-    <div className="admin-dashboard-container">
+    <div className="admin-dashboard-container" style={{ padding: '1.5rem' }}>
       <div className="max-w-7xl mx-auto">
         
         {/* ─── PREMIUM ADMIN HEADER BANNER ─── */}
@@ -15,11 +15,12 @@ const AdminDashboard = () => {
           </p>
         </div>
 
-        {/* ─── EXPLICIT SIDE-BY-SIDE DESKTOP GRID / MOBILE STACK ─── */}
-        <div className="dashboard-top-grid" style={{ display: 'grid', gap: '1.5rem' }}>
+        {/* ─── FLEX-BASED DESKTOP SIDE-BY-SIDE / MOBILE COLUMN STACK ─── */}
+        {/* This bypasses the old CSS breakpoints to run perfectly on all desktop screens! */}
+        <div className="flex flex-col lg:flex-row gap-6 items-start w-full">
           
-          {/* Main Registry Management (Occupies 2/3 width on PC) */}
-          <div className="panel-premium-box" style={{ margin: 0 }}>
+          {/* Main Registry Management (2/3 width on wide screens) */}
+          <div className="panel-premium-box w-full lg:w-2/3" style={{ margin: 0 }}>
             <div className="panel-header-section">
               <h2>Incidents Registry</h2>
               <p>Review, verify, status-track, and globally expunge active community air hazards.</p>
@@ -29,8 +30,8 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Sidebar System Operators Directory (Occupies 1/3 width on PC) */}
-          <div className="panel-premium-box" style={{ margin: 0 }}>
+          {/* Sidebar System Operators Directory (1/3 width on wide screens) */}
+          <div className="panel-premium-box w-full lg:w-1/3" style={{ margin: 0 }}>
             <div className="panel-header-section">
               <h2>System Operators</h2>
               <p>Live database accounts directory registry tracking active profile nodes.</p>
