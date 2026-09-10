@@ -7,7 +7,8 @@ const articles = [
     category: 'Education',
     date: 'Sep 10, 2026',
     excerpt: 'Fine particulate matter can easily penetrate deep into lungs. Learn how to read tracking data indexes to safeguard your family during heavy smog waves.',
-    readTime: '4 min read'
+    readTime: '4 min read',
+    url: 'https://who.int'
   },
   {
     id: 2,
@@ -15,58 +16,61 @@ const articles = [
     category: 'Local Updates',
     date: 'Sep 8, 2026',
     excerpt: 'Our community sensor grid recently flagged brief traffic emission spikes near major highway junctions. Read our full optimization report.',
-    readTime: '5 min read'
+    readTime: '5 min read',
+    url: 'https://unep.org'
   },
   {
     id: 3,
     title: '5 Practical Steps to Reduce Your Local Carbon Footprint Today',
     category: 'Action Plan',
     date: 'Sep 5, 2026',
-    excerpt: 'From optimizing home energy consumption nodes to supporting crowdsourced environmental tools, discovery small changes that drive structural impacts.',
-    readTime: '3 min read'
+    excerpt: 'From optimizing home energy consumption nodes to supporting crowdsourced environmental tools, discover small changes that drive structural impacts.',
+    readTime: '3 min read',
+    url: 'https://nasa.gov'
   }
 ];
 
 const BlogSection = () => {
   return (
-    <div style={{ marginTop: '3rem', marginBottom: '3rem' }}>
-      <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '2.5rem', marginBottom: '1.5rem' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', margin: 0 }}>
+    <div className="mt-12 mb-12 px-4 md:px-0">
+      <div className="border-t border-slate-200 pt-10 mb-6">
+        <h2 className="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">
           Latest Environmental News & Insights
         </h2>
-        <p style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '0.25rem' }}>
+        <p className="text-sm text-slate-500 mt-1">
           Stay updated with localized air analytics reports, atmospheric health tips, and climate change insights.
         </p>
       </div>
 
-      {/* Responsive Flexbox/Grid Matrix wrapper */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', width: '100%' }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
         {articles.map((article) => (
-          <div 
+          <a 
             key={article.id} 
-            className="panel-premium-box" 
-            style={{ margin: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}
+            href={article.url}
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="panel-premium-box m-0 flex flex-col justify-between h-full bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:border-blue-400 hover:shadow-md transition-all cursor-pointer text-left block no-underline"
           >
-            <div className="panel-header-section" style={{ padding: '1rem 1.25rem' }}>
-              <span style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', color: '#2563eb', backgroundColor: '#eff6ff', padding: '0.25rem 0.6rem', borderRadius: '9999px', border: '1px solid #dbeafe' }}>
+            <div className="panel-header-section p-4 bg-slate-50/50 border-b border-slate-100">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100 inline-block">
                 {article.category}
               </span>
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#1e293b', marginTop: '0.75rem', marginBottom: 0, lineHeight: '1.35' }}>
+              <h3 className="text-base font-bold text-slate-800 mt-3 line-clamp-2 leading-snug">
                 {article.title}
               </h3>
             </div>
             
-            <div className="panel-body-padding" style={{ padding: '1.25rem', flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <p style={{ fontSize: '0.85rem', color: '#475569', margin: 0, lineHeight: '1.5' }}>
+            <div className="p-5 flex-grow flex flex-col justify-between">
+              <p className="text-sm text-slate-600 leading-relaxed">
                 {article.excerpt}
               </p>
               
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '1.25rem', borderTop: '1px solid #f1f5f9', paddingTop: '0.75rem' }}>
-                <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 500 }}>{article.date}</span>
-                <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>{article.readTime}</span>
+              <div className="flex items-center justify-between mt-5 pt-3 border-t border-slate-100">
+                <span className="text-xs text-slate-400 font-medium">{article.date}</span>
+                <span className="text-xs text-slate-500 font-semibold">{article.readTime}</span>
               </div>
             </div>
-          </div>
+          </a>
         ))}
       </div>
     </div>

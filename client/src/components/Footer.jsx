@@ -1,27 +1,30 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer style={{ backgroundColor: '#ffffff', borderTop: '1px solid #e2e8f0', padding: '1.5rem 2rem', marginTop: 'auto', width: '100%', boxSizing: 'border-box' }}>
-      <div style={{ maxWidth: '80rem', margin: '0 auto', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+    <footer className="w-full bg-white border-t border-slate-200 py-6 px-6 md:px-12 mt-auto box-border">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         
-        {/* Brand Meta Signature */}
-        <div>
-          <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a', letterSpacing: '-0.01em' }}>
+        <div className="text-center md:text-left">
+          <span className="text-sm font-bold text-slate-900 tracking-tight block">
             Clean Air Now
           </span>
-          <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '0.15rem 0 0 0' }}>
+          <p className="text-xs text-slate-400 mt-0.5">
             © {new Date().getFullYear()} Monitoring ecosystems, protecting urban air spheres.
           </p>
         </div>
 
-        {/* Informative Link Placeholders */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500, cursor: 'pointer' }}>Sensors Registry</span>
-          <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500, cursor: 'pointer' }}>Community Guidelines</span>
-          <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500, cursor: 'pointer' }}>Privacy Policy</span>
-          <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-            <span style={{ display: 'inline-block', width: '6px', height: '6px', backgroundColor: '#10b981', borderRadius: '50%' }}></span>
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs">
+          <span className="text-slate-400 font-medium cursor-default">Sensors Registry</span>
+          <Link to="/community-guidelines" className="text-slate-500 font-medium hover:text-slate-900 transition-colors no-underline">
+            Community Guidelines
+          </Link>
+          <Link to="/privacy-policy" className="text-slate-500 font-medium hover:text-slate-900 transition-colors no-underline">
+            Privacy Policy
+          </Link>
+          <span className="text-emerald-600 font-bold flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
+            <span className="inline-block w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
             API Live
           </span>
         </div>

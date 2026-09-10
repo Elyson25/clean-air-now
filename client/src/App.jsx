@@ -10,6 +10,7 @@ import AdminPage from './pages/AdminPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import ProfilePage from './pages/ProfilePage';
+import InfoPage from './pages/InfoPage'; // 👈 Imported your new info layout page
 
 // Import Components
 import Navbar from './components/Navbar';
@@ -23,16 +24,17 @@ function App() {
       <Navbar />
       <Toaster position="top-center" reverseOrder={false} />
       
-      {/* The main content zone expands automatically to push the footer down on tall desktop viewports */}
       <main style={{ flexGrow: 1 }}>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          
-          {/* --- THIS IS THE RESET ROUTE --- */}
           <Route path="/resetpassword/:resettoken" element={<ResetPasswordPage />} />
+          
+          {/* Info Document Routes */}
+          <Route path="/privacy-policy" element={<InfoPage />} />
+          <Route path="/community-guidelines" element={<InfoPage />} />
 
           {/* Protected User Routes */}
           <Route element={<ProtectedRoute />}>
@@ -47,7 +49,6 @@ function App() {
         </Routes>
       </main>
 
-      {/* ─── 🌐 GLOBAL PLATFORM FOOTER FRAMEWORK ─── */}
       <Footer />
     </Router>
   );
