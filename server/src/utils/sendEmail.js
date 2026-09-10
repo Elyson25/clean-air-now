@@ -1,39 +1,53 @@
 const nodemailer = require('nodemailer');
 
 const sendEmail = async (options) => {
-  // 1. Create a transporter with the most explicit and robust settings for Gmail on a server.
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com', // Use the direct hostname, not the 'service' shortcut
-    port: 465,              // The standard SSL port for secure SMTP
-    secure: true,           // Enforce a secure (SSL/TLS) connection from the start
-    auth: {
-      user: process.env.EMAIL_USER, // Your full Gmail address from .env
-      pass: process.env.EMAIL_PASS, // Your 16-character App Password from .env
-    },
-    // Add a connection timeout to prevent the server from hanging for too long
-    connectionTimeout: 10000, // 10 seconds
-  });
+  // Determine if we should use Mailtrap or fall back to Gmail depending on what you configured on Render
+  const isMailtrap = process.env.EMAIL_SERVICE === 'mailtrap' || !process.env.EMAIL_SERVICE;
 
-  // 2. Define the email content
+  const transporterConfig = isMailtrap
+    ? {
+        // ─── PRODUCTION MAILTRAP RE-ROUTING GATEWAY ───
+        host: process.env.EMAIL_HOST || 'sandbox.smtp.mailtrap.io',
+        port: parseInt(process.env.EMAIL_PORT) || 2525,
+        secure: false, // Mailtrap sandbox doesn't expect secure true on port 2525
+        auth: {
+          user: process.env.EMAIL_USER, // Will read your Mailtrap Username token from Render
+          pass: process.env.EMAIL_PASS, // Will read your Mailtrap Password string from Render
+        },
+        connectionTimeout: 10000,
+      }
+    : {
+        // ─── LOCAL FALLBACK OR REAL SMTP DIRECT GMAIL GATES ───
+        host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.EMAIL_PORT) || 465,
+        secure: process.env.EMAIL_PORT == '465',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+        connectionTimeout: 10000,
+      };
+
+  const transporter = nodemailer.createTransport(transporterConfig);
+
+  // Define the email content payload structure
   const mailOptions = {
-    from: process.env.EMAIL_FROM,
+    from: process.env.EMAIL_FROM || 'Clean Air Now <noreply@cleanairnow.com>',
     to: options.email,
     subject: options.subject,
     text: options.message,
   };
 
-  // 3. Send the email with detailed logging
+  // Dispatch message execution loop with descriptive live log reporting
   try {
-    console.log('Attempting to send email via Gmail...');
+    console.log(`Attempting transaction routing via engine: ${isMailtrap ? 'Mailtrap Sandbox' : 'Direct SMTP Gmail'}`);
     let info = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully via Gmail. Message ID:', info.messageId);
+    console.log(`Email dispatched successfully. Message Transaction ID: ${info.messageId}`);
   } catch (error) {
-    // THIS IS THE MOST IMPORTANT LOG. It will print the exact technical error.
     console.error('--- NODEMAILER CRITICAL FAILURE ---');
-    console.error('Nodemailer failed to send email. The error object is:', error);
+    console.error('Nodemailer system failed to transmit message payload:', error);
     console.error('--- END OF ERROR ---');
-    // Re-throw the error so the controller that called this function knows it failed
-    throw new Error('Email could not be sent. Check server logs for detailed error.');
+    throw new Error('Email transit crashed. Please review active backend orchestration configs.');
   }
 };
 
