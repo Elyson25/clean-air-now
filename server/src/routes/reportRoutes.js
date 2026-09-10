@@ -7,6 +7,8 @@ const {
   getPublicReports,
   getAllReports,
   updateReportStatus,
+  updateReport, // Imported new dynamic content update controller
+  deleteReport, // Imported new secure entity purge controller
 } = require('../controllers/reportController');
 const { protect, admin } = require('../middleware/authMiddleware');
 const { handleValidationErrors } = require('../middleware/validationMiddleware');
@@ -23,7 +25,17 @@ const reportValidation = [
 router.route('/public').get(getPublicReports);
 router.route('/').post(protect, reportValidation, createReport);
 router.route('/myreports').get(protect, getUserReports);
+
+// Master Administrative Registry Fetch Gateway
 router.route('/').get(protect, admin, getAllReports);
+
+// Specific Status Workflow Modification Gateway (Admin Restricted)
 router.route('/:id/status').put(protect, admin, updateReportStatus);
+
+// ─── NEW: SECURE SINGLE RECORD OPERATIONS ROUTE VERBS ───
+// Handles instance updates and purges shielded by verified identity layers
+router.route('/:id')
+  .put(protect, updateReport)    // Both Owner & Admins can reach, guarded internally by controller checks
+  .delete(protect, deleteReport); // Both Owner & Admins can reach, guarded internally by controller checks
 
 module.exports = router;
