@@ -28,24 +28,47 @@ const Login = () => {
   };
 
   return (
-    <div className="border border-gray-300 p-5 rounded-lg max-w-md w-full mx-auto my-6 bg-white">
-      <h2 className="text-xl font-semibold text-center mb-4">Login to Your Account</h2>
+    <div className="w-full">
+      {/* Login Form */}
       <form onSubmit={onSubmit}>
-        <div className="mb-4">
-          <label>Email Address</label>
-          <input type="email" name="email" value={formData.email} onChange={onChange} required className="w-full p-2 border border-gray-300 rounded mt-1"/>
+        
+        {/* Email Address Input Group */}
+        <div className="auth-input-group">
+          <label className="auth-input-label">Email Address</label>
+          <input 
+            type="email" 
+            name="email" 
+            value={formData.email} 
+            onChange={onChange} 
+            required 
+            className="auth-premium-input"
+            placeholder="Enter your email address"
+          />
         </div>
-        <div className="mb-4">
-          <label>Password</label>
-          <input type="password" name="password" value={formData.password} onChange={onChange} required className="w-full p-2 border border-gray-300 rounded mt-1"/>
+        
+        {/* Password Input Group */}
+        <div className="auth-input-group">
+          <label className="auth-input-label">Password</label>
+          <input 
+            type="password" 
+            name="password" 
+            value={formData.password} 
+            onChange={onChange} 
+            required 
+            className="auth-premium-input"
+            placeholder="••••••••"
+          />
         </div>
-        {/* --- THIS LINK MUST BE PRESENT --- */}
-        <div className="text-right mb-4">
-          <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
+
+        {/* ─── CRUCIAL FORGOT PASSWORD ROUTING LINK ─── */}
+        <div className="text-right" style={{ marginBottom: '1.5rem' }}>
+          <Link to="/forgot-password" className="auth-forgot-link">
             Forgot Password?
           </Link>
         </div>
-        <button type="submit" className="w-full p-2 bg-green-500 text-white rounded hover:bg-green-600">
+
+        {/* Premium Action Submit Button */}
+        <button type="submit" className="auth-action-btn btn-login-theme">
           Login
         </button>
       </form>

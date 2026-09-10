@@ -1,4 +1,3 @@
-// client/src/components/Register.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -35,27 +34,70 @@ const Register = () => {
   };
 
   return (
-    <div className="border border-gray-300 p-5 rounded-lg max-w-md w-full mx-auto my-6 bg-white">
-      <h2 className="text-xl font-semibold text-center mb-4">Create an Account</h2>
+    <div className="w-full">
+      {/* Registration Form */}
       <form onSubmit={onSubmit}>
-        {/* ... form inputs (name, email, password, confirmPassword) ... */}
-        <div className="mb-4">
-          <label>Name</label>
-          <input type="text" name="name" value={name} onChange={onChange} required className="w-full p-2 border border-gray-300 rounded mt-1"/>
+        
+        {/* Full Name Input Group */}
+        <div className="auth-input-group">
+          <label className="auth-input-label">Name</label>
+          <input 
+            type="text" 
+            name="name" 
+            value={name} 
+            onChange={onChange} 
+            required 
+            className="auth-premium-input"
+            placeholder="John Doe"
+          />
         </div>
-        <div className="mb-4">
-          <label>Email Address</label>
-          <input type="email" name="email" value={email} onChange={onChange} required className="w-full p-2 border border-gray-300 rounded mt-1"/>
+
+        {/* Email Address Input Group */}
+        <div className="auth-input-group">
+          <label className="auth-input-label">Email Address</label>
+          <input 
+            type="email" 
+            name="email" 
+            value={email} 
+            onChange={onChange} 
+            required 
+            className="auth-premium-input"
+            placeholder="you@example.com"
+          />
         </div>
-        <div className="mb-4">
-          <label>Password (min. 6 characters)</label>
-          <input type="password" name="password" minLength="6" value={password} onChange={onChange} required className="w-full p-2 border border-gray-300 rounded mt-1"/>
+
+        {/* Password Selection Input Group */}
+        <div className="auth-input-group">
+          <label className="auth-input-label">Password (min. 6 characters)</label>
+          <input 
+            type="password" 
+            name="password" 
+            minLength="6" 
+            value={password} 
+            onChange={onChange} 
+            required 
+            className="auth-premium-input"
+            placeholder="••••••••"
+          />
         </div>
-        <div className="mb-4">
-          <label>Confirm Password</label>
-          <input type="password" name="confirmPassword" minLength="6" value={confirmPassword} onChange={onChange} required className="w-full p-2 border border-gray-300 rounded mt-1"/>
+
+        {/* Password Confirmation Verification Input Group */}
+        <div className="auth-input-group">
+          <label className="auth-input-label">Confirm Password</label>
+          <input 
+            type="password" 
+            name="confirmPassword" 
+            minLength="6" 
+            value={confirmPassword} 
+            onChange={onChange} 
+            required 
+            className="auth-premium-input"
+            placeholder="••••••••"
+          />
         </div>
-        <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+
+        {/* High-Primary Registration Call Button */}
+        <button type="submit" className="auth-action-btn btn-register-theme">
           Register
         </button>
       </form>
