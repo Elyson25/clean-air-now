@@ -15,11 +15,11 @@ const AdminDashboard = () => {
           </p>
         </div>
 
-        {/* ─── TWO-COLUMN SIDE-BY-SIDE PLATFORM GRID ─── */}
-        <div className="dashboard-top-grid">
+        {/* ─── EXPLICIT SIDE-BY-SIDE DESKTOP GRID / MOBILE STACK ─── */}
+        <div className="dashboard-top-grid" style={{ display: 'grid', gap: '1.5rem' }}>
           
-          {/* Main Registry Management (Occupies 2/3 width on PC, full width on phones) */}
-          <div className="panel-premium-box">
+          {/* Main Registry Management (Occupies 2/3 width on PC) */}
+          <div className="panel-premium-box" style={{ margin: 0 }}>
             <div className="panel-header-section">
               <h2>Incidents Registry</h2>
               <p>Review, verify, status-track, and globally expunge active community air hazards.</p>
@@ -29,8 +29,8 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Sidebar System Operators Directory (Occupies 1/3 width on PC, full width on phones) */}
-          <div className="panel-premium-box">
+          {/* Sidebar System Operators Directory (Occupies 1/3 width on PC) */}
+          <div className="panel-premium-box" style={{ margin: 0 }}>
             <div className="panel-header-section">
               <h2>System Operators</h2>
               <p>Live database accounts directory registry tracking active profile nodes.</p>
