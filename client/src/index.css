@@ -1,19 +1,17 @@
-/* ─── TAILWIND CSS INTEGRATION ─── */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-
-/* ─── GLOBAL SYSTEM ENGINE SETUP ─── */
+/* ─── 1. GLOBAL CORE ARCHITECTURE SETUP ─── */
 html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  background-color: #f8fafc; /* Premium clean slate bg */
+  background-color: #f8fafc; /* Premium smooth slate canvas */
   color: #0f172a;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 main {
@@ -22,7 +20,50 @@ main {
   flex-direction: column;
 }
 
-/* ─── PREMIUM LANDING VIEWPORT HERO ─── */
+/* ─── 2. UNIVERSAL PANEL CARD CONTAINERS ─── */
+.admin-dashboard-container {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.panel-premium-box {
+  background: white;
+  border-radius: 1.25rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 1.5rem;
+}
+
+.panel-header-section {
+  padding: 1.25rem 1.5rem;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.panel-header-section h2 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.panel-header-section p {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0.25rem 0 0 0;
+}
+
+.panel-body-padding {
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+/* ─── 3. LANDING HERO & AUTH CARD MODULES ─── */
 .portal-hero-section {
   text-align: center;
   max-width: 800px;
@@ -45,7 +86,6 @@ main {
   line-height: 1.6;
   max-width: 620px;
   margin: 0 auto 2.5rem auto;
-  font-weight: 500;
 }
 
 .premium-portal-btn {
@@ -55,7 +95,6 @@ main {
   background-color: #2563eb;
   color: white !important;
   font-weight: 700;
-  font-size: 1rem;
   padding: 1rem 2.25rem;
   border-radius: 0.75rem;
   border: none;
@@ -68,10 +107,8 @@ main {
 .premium-portal-btn:hover {
   background-color: #1d4ed8;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
 }
 
-/* ─── UNIFIED PORTAL AUTH CARD OVERHAUL ─── */
 .auth-page-container {
   display: flex;
   align-items: center;
@@ -86,7 +123,7 @@ main {
   background: white;
   border: 1px solid #e2e8f0;
   border-radius: 1.5rem;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
   overflow: hidden;
 }
 
@@ -99,15 +136,6 @@ main {
   font-size: 1.75rem;
   font-weight: 800;
   color: #0f172a;
-  margin: 0;
-  letter-spacing: -0.02em;
-}
-
-.auth-card-header p {
-  font-size: 0.875rem;
-  color: #64748b;
-  margin: 0.5rem 0 0 0;
-  font-weight: 500;
 }
 
 .auth-form-body {
@@ -133,7 +161,6 @@ main {
   border-radius: 0.625rem;
   border: 1px solid #cbd5e1;
   background-color: #ffffff;
-  color: #0f172a;
   outline: none;
   transition: all 0.2s ease;
   box-sizing: border-box;
@@ -154,69 +181,147 @@ main {
   cursor: pointer;
   color: white;
   transition: all 0.2s ease;
-  margin-top: 1rem;
 }
 
-.btn-register-theme {
-  background-color: #2563eb;
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
-}
-.btn-register-theme:hover {
-  background-color: #1d4ed8;
-  transform: translateY(-1px);
+.btn-register-theme { background-color: #2563eb; }
+.btn-login-theme { background-color: #10b981; }
+
+.auth-toggle-footer { text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: #64748b; }
+.auth-toggle-link { color: #2563eb; font-weight: 700; background: none; border: none; cursor: pointer; }
+
+/* ─── 4. MAIN USER WORKSPACE RESPONSIVE GRIDS ─── */
+.user-hero-header {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 1.5rem;
 }
 
-.btn-login-theme {
-  background-color: #10b981;
-  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
-}
-.btn-login-theme:hover {
-  background-color: #059669;
-  transform: translateY(-1px);
+.user-hero-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  margin: 0;
 }
 
-.auth-toggle-footer {
-  text-align: center;
-  margin-top: 1.5rem;
-  font-size: 0.875rem;
+.user-hero-subtitle {
+  font-size: 0.95rem;
   color: #64748b;
-  font-weight: 500;
-}
-
-.auth-toggle-link {
-  color: #2563eb;
-  font-weight: 700;
-  text-decoration: none;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  margin-left: 0.25rem;
-}
-.auth-toggle-link:hover {
-  text-decoration: underline;
-}
-
-.auth-forgot-link {
-  display: block;
-  text-align: right;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #2563eb;
-  text-decoration: none;
   margin-top: 0.5rem;
 }
 
-/* ─── GEOLOCATION MAP PIN CORE ─── */
+.dashboard-top-grid {
+  display: grid;
+  grid-template-cols: 2fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.dashboard-bottom-grid {
+  display: grid;
+  grid-template-cols: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  width: 100%;
+}
+
+/* Fluid responsive collapse rules for mobile viewports */
+@media (max-width: 1024px) {
+  .dashboard-top-grid,
+  .dashboard-bottom-grid {
+    grid-template-cols: 1fr !important;
+  }
+  .admin-dashboard-container {
+    padding: 1rem;
+  }
+}
+
+/* ─── 5. USER FORMS & TIMELINE TRACKERS ─── */
+.user-premium-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  border-radius: 0.5rem;
+  border: 1px solid #cbd5e1;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.geo-inputs-flex {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn-geo-locator {
+  width: 100%;
+  background-color: #2563eb;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-report-submit {
+  width: 100%;
+  background-color: #ef4444;
+  color: white;
+  font-weight: 700;
+  padding: 0.85rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  margin-top: 1.25rem;
+}
+
+.timeline-item-card {
+  padding: 1rem;
+  border-left: 4px solid #10b981;
+  background-color: #f8fafc;
+  border-radius: 0 0.75rem 0.75rem 0;
+  margin-top: 1rem;
+}
+
+/* ─── 6. INTERACTIVE DATA TABLES & MAP NODES ─── */
+.premium-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  background: white;
+}
+
+.premium-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.premium-table th {
+  background-color: #f8fafc;
+  padding: 0.875rem 1.25rem;
+  font-weight: 700;
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+.premium-table td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.operator-list-stack { display: flex; flex-direction: column; gap: 1rem; }
+.operator-item-card { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f1f5f9; }
+.operator-avatar-circle { height: 2.25rem; width: 2.25rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+
 .live-location-icon {
   background-color: #3b82f6;
   border-radius: 50%;
   width: 18px;
   height: 18px;
   border: 2px solid white;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
-
 .live-location-icon::before {
   content: '';
   position: absolute;
@@ -227,10 +332,9 @@ main {
   border-radius: 50%;
   background-color: rgba(59, 130, 246, 0.3);
   transform: translate(-50%, -50%);
-  animation: pulse 2s infinite;
+  animation: userPulse 2s infinite;
 }
-
-@keyframes pulse {
+@keyframes userPulse {
   0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
   70% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
   100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
