@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const UserList = () => {
-  const { token } = useAuth();
+  const { token, user: currentUser } = useAuth();
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -28,6 +29,26 @@ const UserList = () => {
     };
     fetchUsers();
   }, [token, API_BASE_URL]);
+
+  // ─── 👑 NEW: MASTER ADMINISTRATIVE USER RECOVERY ACTION ───
+  const handleDeleteUser = async (userId, userName) => {
+    if (userId === currentUser?._id) {
+      return toast.error('Action restricted: You cannot delete your own master admin session!');
+    }
+
+    if (!window.confirm(`MASTER OVERRIDE: Are you sure you want to permanently remove "${userName}" from the platform registries?`)) return;
+
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      await axios.delete(`${API_BASE_URL}/api/users/${userId}`, config);
+      toast.success(`Account for "${userName}" successfully expunged!`);
+      
+      // Instantly optimize local array states to clear the row immediately on the dashboard feed
+      setUsers((prevUsers) => prevUsers.filter((u) => u._id !== userId));
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to execute administrative account purge.');
+    }
+  };
 
   return (
     <div className="w-full">
@@ -73,8 +94,8 @@ const UserList = () => {
                 </div>
               </div>
 
-              {/* Status Security Badge Right Block */}
-              <div className="ml-2 flex-shrink-0">
+              {/* Status Security Badge Right Block & Action Area */}
+              <div className="ml-2 flex-shrink-0 flex items-center gap-2">
                 <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border shadow-sm transition-all ${
                   user.role === 'admin' || user.isAdmin
                     ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
@@ -82,6 +103,29 @@ const UserList = () => {
                 }`}>
                   {user.role === 'admin' || user.isAdmin ? 'Admin' : 'Operator'}
                 </span>
+
+                {/* 👑 MASTER ADMIN OVERRIDE TRASH USER ACTION CONTROL */}
+                {/* Prevent administrators from deleting themselves accidentally */}
+                {user._id !== currentUser?._id && (
+                  <button
+                    onClick={() => handleDeleteUser(user._id, user.name)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#ef4444',
+                      cursor: 'pointer',
+                      fontSize: '0.9rem',
+                      padding: '4px',
+                      borderRadius: '4px',
+                      transition: 'all 0.2s',
+                    }}
+                    title="Remove operator account from system registry"
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#fef2f2'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                  >
+                    🗑️
+                  </button>
+                )}
               </div>
 
             </div>

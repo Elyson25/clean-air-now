@@ -47,6 +47,22 @@ const ReportManager = () => {
     }
   };
 
+  // ─── MASTER ADMINISTRATIVE DATABASE PURGE ACTIONER ───
+  const handleDeleteReport = async (reportId) => {
+    if (!window.confirm('ADMIN OVERRIDE: Are you sure you want to permanently erase this report from the database?')) return;
+
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      await axios.delete(`${API_BASE_URL}/api/reports/${reportId}`, config);
+      toast.success('Incident successfully expunged from platform master records!');
+      
+      // Instantly optimize local array states to pull the row out of the view
+      setReports(currentReports => currentReports.filter(report => report._id !== reportId));
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to execute master report deletion.');
+    }
+  };
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -102,7 +118,7 @@ const ReportManager = () => {
                       Timeline Stamp
                     </th>
                     <th scope="col" className="px-5 py-3.5 text-right text-xs font-bold text-slate-400 uppercase tracking-widest">
-                      Operational Status
+                      Operational Actions
                     </th>
                   </tr>
                 </thead>
@@ -136,9 +152,9 @@ const ReportManager = () => {
                         </span>
                       </td>
 
-                      {/* Column 4: Interactive Status Dropdown Switcher */}
+                      {/* Column 4: Interactive Status Dropdown & Master Trash Overrides */}
                       <td className="px-5 py-4 whitespace-nowrap text-right">
-                        <div className="inline-flex items-center gap-2">
+                        <div className="inline-flex items-center gap-3">
                           <select
                             value={report.status}
                             onChange={(e) => handleStatusChange(report._id, e.target.value)}
@@ -148,6 +164,26 @@ const ReportManager = () => {
                             <option value="In Review">In Review</option>
                             <option value="Resolved">Resolved</option>
                           </select>
+
+                          {/* MASTER ADMIN OVERRIDE TRASH OPERATION CONTROL */}
+                          <button
+                            onClick={() => handleDeleteReport(report._id)}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: '#ef4444',
+                              cursor: 'pointer',
+                              fontSize: '1.1rem',
+                              padding: '6px',
+                              borderRadius: '6px',
+                              transition: 'all 0.2s'
+                            }}
+                            title="Admin Purge: Delete permanently from system"
+                            onMouseEnter={(e) => e.target.style.backgroundColor = '#fef2f2'}
+                            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                          >
+                            🗑️
+                          </button>
                         </div>
                       </td>
 
