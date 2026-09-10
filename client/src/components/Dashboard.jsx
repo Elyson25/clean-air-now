@@ -4,6 +4,7 @@ import ReportForm from './ReportForm';
 import MyReports from './MyReports';
 import AQIDisplay from './AQIDisplay';
 import AqiHistoryChart from './AqiHistoryChart';
+import BlogSection from './BlogSection'; // 👈 Imported your new premium blog section
 import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
@@ -138,6 +139,9 @@ const Dashboard = () => {
           </div>
 
         </div>
+
+        {/* ─── 📰 NEW: RESPONSIVE COMMUNITY INSIGHTS & BLOG NEWS GRID ─── */}
+        <BlogSection />
 
       </div>
     </div>

@@ -13,6 +13,7 @@ import ProfilePage from './pages/ProfilePage';
 
 // Import Components
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 
@@ -21,12 +22,15 @@ function App() {
     <Router>
       <Navbar />
       <Toaster position="top-center" reverseOrder={false} />
-      <main>
+      
+      {/* The main content zone expands automatically to push the footer down on tall desktop viewports */}
+      <main style={{ flexGrow: 1 }}>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          
           {/* --- THIS IS THE RESET ROUTE --- */}
           <Route path="/resetpassword/:resettoken" element={<ResetPasswordPage />} />
 
@@ -42,6 +46,9 @@ function App() {
           </Route>
         </Routes>
       </main>
+
+      {/* ─── 🌐 GLOBAL PLATFORM FOOTER FRAMEWORK ─── */}
+      <Footer />
     </Router>
   );
 }
